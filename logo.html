@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swastik Yadav - Portfolio Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0a041f;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #8A2BE2, #4F46E5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+        }
+        .scroll-indicator {
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+        .background-waves {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="relative">
+
+    <!-- Abstract Wave Background -->
+    <div class="background-waves" aria-hidden="true">
+        <svg viewBox="0 0 1440 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1440 0V800H0V0H1440Z" fill="#0a041f"/>
+            <path d="M-283.5 820C-315.637 763.491 -357.69 590.22 -237 503C-116.31 415.78 183.5 503 331 426C478.5 349 718.5 133 874.5 220C1030.5 307 1121 443.5 1251.5 503C1382 562.5 1581.5 566.5 1656 426" stroke="url(#paint0_linear_1_2)" stroke-width="2" stroke-opacity="0.3"/>
+            <path d="M-321.5 848C-355.885 788.134 -385.5 613 -256.5 531.5C-127.5 450 178.5 540 331 454.5C483.5 369 698.5 157 864.5 244C1030.5 331 1131 487.5 1251.5 531.5C1372 575.5 1533 553.5 1626 454.5" stroke="url(#paint1_linear_1_2)" stroke-width="2" stroke-opacity="0.2"/>
+             <path d="M-223.5 800C-255.637 743.491 -297.69 570.22 -177 483C-56.31 395.78 243.5 483 391 406C538.5 329 778.5 113 934.5 200C1090.5 287 1181 423.5 1311.5 483C1442 542.5 1641.5 546.5 1716 406" stroke="url(#paint2_linear_1_2)" stroke-width="2" stroke-opacity="0.4"/>
+            <defs>
+                <linearGradient id="paint0_linear_1_2" x1="686.25" y1="210" x2="686.25" y2="820" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#8A2BE2" stop-opacity="0"/>
+                    <stop offset="1" stop-color="#4F46E5"/>
+                </linearGradient>
+                <linearGradient id="paint1_linear_1_2" x1="652.25" y1="234" x2="652.25" y2="848" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#8A2BE2" stop-opacity="0"/>
+                    <stop offset="1" stop-color="#4F46E5"/>
+                </linearGradient>
+                 <linearGradient id="paint2_linear_1_2" x1="746.25" y1="190" x2="746.25" y2="800" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#8A2BE2" stop-opacity="0"/>
+                    <stop offset="1" stop-color="#4F46E5"/>
+                </linearGradient>
+            </defs>
+        </svg>
+    </div>
+
+    <div class="min-h-screen flex flex-col max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <!-- Header/Navigation -->
+        <header class="py-6">
+            <nav class="flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path><path d="M4 12L12 4L20 12L12 20L4 12Z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path></svg>
+                    <span class="text-xl font-bold text-white">Swastik <span class="font-light opacity-80">| Yadav</span></span>
+                </div>
+                <!-- Navigation Links -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="text-gray-300 hover:text-white transition-colors duration-300">About</a>
+                    <a href="#" class="text-gray-300 hover:text-white transition-colors duration-300">Experience</a>
+                    <a href="#" class="text-gray-300 hover:text-white transition-colors duration-300">Skills</a>
+                    <a href="#" class="text-gray-300 hover:text-white transition-colors duration-300">Contact</a>
+                </div>
+                 <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button class="text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow flex flex-col justify-center text-center lg:text-left">
+            <div class="grid lg:grid-cols-2 items-center gap-12">
+                <!-- Text Content -->
+                <div class="space-y-4">
+                    <h1 class="text-5xl md:text-7xl font-bold leading-tight text-white">
+                        Hi, I'm <span class="gradient-text">Swastik</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-gray-300 max-w-md mx-auto lg:mx-0">
+                        i develop 3d visuals, user interfaces and web applications
+                    </p>
+                </div>
+
+                <!-- Image/Visual Content -->
+                <div class="w-full h-64 md:h-96 flex items-center justify-center">
+                    <!-- Placeholder for the 3D computer setup -->
+                     <svg xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-gray-700 opacity-60" viewBox="0 0 256 160" fill="none">
+                        <rect x="1" y="1" width="254" height="144" rx="12" fill="#111827"/>
+                        <rect x="1" y="1" width="254" height="144" rx="12" stroke="url(#paint0_linear_3_3)" stroke-width="2"/>
+                        <path d="M128 159L100 145H156L128 159Z" fill="#1F2937"/>
+                        <path d="M32 30H72" stroke="#4B5563" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M32 40H60" stroke="#4B5563" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M32 60H90" stroke="#22c55e" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M32 70H120" stroke="#3b82f6" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M32 80H100" stroke="#a855f7" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M32 100H80" stroke="#f97316" stroke-width="4" stroke-linecap="round"/>
+                        <defs>
+                        <linearGradient id="paint0_linear_3_3" x1="128" y1="0" x2="128" y2="146" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#4F46E5"/>
+                        <stop offset="1" stop-color="#8A2BE2"/>
+                        </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Scroll Down Indicator -->
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2">
+                <div class="w-8 h-14 border-2 border-gray-500 rounded-full flex justify-center items-start p-1 scroll-indicator">
+                    <div class="w-1 h-3 bg-gray-400 rounded-full"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

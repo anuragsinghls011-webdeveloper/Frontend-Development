@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRMS College Portal - Welcome</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" xintegrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator/qrcode.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.4);
+            --bg-light: #f3f4f6;
+            --bg-dark: #111827;
+            --card-light: #ffffff;
+            --card-dark: #1f2937;
+            --text-light: #1f2937;
+            --text-dark: #f9fafb;
+            --text-muted-light: #6b7280;
+            --text-muted-dark: #9ca3af;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+        }
+        .dark body {
+            background-color: var(--bg-dark);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+        @keyframes modal-in {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-animate {
+            animation: modal-in 0.3s ease-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        .nav-link {
+            transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white !important;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+        .nav-link.active i {
+            color: white;
+        }
+        .card-hover-effect {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover-effect:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+        }
+        .dark .card-hover-effect:hover {
+            box-shadow: 0 0 25px var(--primary-glow);
+        }
+        .info-tab {
+            transition: border-color 0.3s, color 0.3s;
+        }
+        .info-tab.active {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        .info-content {
+            display: none;
+        }
+        .info-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        .srms-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 20px auto 10px;
+            border: 4px solid var(--primary-color);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
+
+    <div id="app-container">
+
+        <div id="entry-view" class="min-h-screen flex items-center justify-center p-4 fade-in">
+             <div class="w-full max-w-md text-center">
+                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-yjbGNmOkPV97VpEhrCzGiHkbK5xNhHTuPO7OewcLWz-EqPwidFwBmtLAs-kHHfYqHXo&usqp=CAU" class="srms-logo" alt="SRMS Logo">
+                 <h1 class="text-3xl font-bold text-gray-800 dark:text-white mt-4">SRMS College Portal</h1>
+                 <p class="text-gray-600 dark:text-gray-400 mt-2 mb-8">Choose your action to continue.</p>
+                 <div class="space-y-4">
+                     <button id="show-student-login" class="w-full py-3 px-4 rounded-lg text-white font-semibold btn-primary text-lg">
+                         <i class="fas fa-user-graduate mr-2"></i> Student Login
+                     </button>
+                     <button id="show-student-registration" class="w-full py-3 px-4 rounded-lg text-white font-semibold bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-lg">
+                         <i class="fas fa-user-plus mr-2"></i> Student Registration
+                     </button>
+                     <button id="show-admin-login" class="w-full py-3 px-4 rounded-lg text-white font-semibold bg-gray-600 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-lg">
+                         <i class="fas fa-user-shield mr-2"></i> Admin Login
+                     </button>
+                 </div>
+             </div>
+        </div>
+
+        <div id="student-registration-view" class="hidden min-h-screen flex items-center justify-center p-4">
+            <div class="w-full max-w-md">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-yjbGNmOkPV97VpEhrCzGiHkbK5xNhHTuPO7OewcLWz-EqPwidFwBmtLAs-kHHfYqHXo&usqp=CAU" class="srms-logo" alt="SRMS Logo">
+                <div class="bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8">
+                    <button class="back-to-entry text-gray-500 hover:text-blue-500 mb-4"><i class="fas fa-arrow-left mr-2"></i> Back</button>
+                    <h2 class="text-center text-2xl font-bold text-gray-800 dark:text-white">Student Registration</h2>
+                    <p class="text-center text-sm text-gray-500 dark:text-gray-400 mb-6">Create your new account.</p>
+                    <form id="registration-form-main">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="reg-fullname" class="text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
+                                <input id="reg-fullname" name="fullname" type="text" required class="mt-1 block w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Your Full Name">
+                            </div>
+                            <div>
+                                <label for="reg-email" class="text-sm font-medium text-gray-700 dark:text-gray-300">Email Address</label>
+                                <input id="reg-email" name="email" type="email" required class="mt-1 block w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="you@srms.ac.in">
+                            </div>
+                            <div>
+                                <label for="reg-rollnumber" class="text-sm font-medium text-gray-700 dark:text-gray-300">Roll Number</label>
+                                <input id="reg-rollnumber" name="rollnumber" type="text" required class="mt-1 block w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="College Roll Number">
+                            </div>
+                            <div>
+                                <label for="reg-password" class="text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+                                <input id="reg-password" name="password" type="password" required class="mt-1 block w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                            </div>
+                             <div>
+                                <label for="reg-confirm-password" class="text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
+                                <input id="reg-confirm-password" name="confirm_password" type="password" required class="mt-1 block w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white btn-primary">Register</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="student-login-view" class="hidden min-h-screen flex items-center justify-center p-4">
+            <div class="w-full max-w-md">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-yjbGNmOkPV97VpEhrCzGiHkbK5xNhHTuPO7OewcLWz-EqPwidFwBmtLAs-kHHfYqHXo&usqp=CAU" class="srms-logo" alt="SRMS Logo">
+                <div class="bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8">
+                    <button class="back-to-entry text-gray-500 hover:text-blue-500 mb-4"><i class="fas fa-arrow-left mr-2"></i> Back</button>
+                    <h2 class="text-center text-2xl font-bold text-gray-800 dark:text-white">Student Login</h2>
+                    <p class="text-center text-sm text-gray-500 dark:text-gray-400 mb-6">Sign in to access your dashboard.</p>
+                    <form class="login-form">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="student-email" class="text-sm font-medium text-gray-700 dark:text-gray-300">Email Address</label>
+                                <input name="email" type="email" autocomplete="email" required class="mt-1 block w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="you@srms.ac.in">
+                            </div>
+                            <div>
+                                <label for="student-password" class="text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+                                <input name="password" type="password" autocomplete="current-password" required class="mt-1 block w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="text-sm">
+                                <a href="#" class="font-medium text-blue-600 hover:text-blue-500">Forgot your password?</a>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white btn-primary">Sign in</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-login-view" class="hidden min-h-screen flex items-center justify-center p-4">
+            <div class="w-full max-w-md">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-yjbGNmOkPV97VpEhrCzGiHkbK5xNhHTuPO7OewcLWz-EqPwidFwBmtLAs-kHHfYqHXo&usqp=CAU" class="srms-logo" alt="SRMS Logo">
+                <div class="bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8">
+                    <button class="back-to-entry text-gray-500 hover:text-blue-500 mb-4"><i class="fas fa-arrow-left mr-2"></i> Back</button>
+                    <h2 class="text-center text-2xl font-bold text-gray-800 dark:text-white">Admin Login</h2>
+                    <p class="text-center text-sm text-gray-500 dark:text-gray-400 mb-6">Sign in to manage the portal.</p>
+                    <form class="login-form">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="admin-email" class="text-sm font-medium text-gray-700 dark:text-gray-300">Email Address</label>
+                                <input name="email" type="email" autocomplete="email" required class="mt-1 block w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="admin@srms.ac.in">
+                            </div>
+                            <div>
+                                <label for="admin-password" class="text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+                                <input name="password" type="password" autocomplete="current-password" required class="mt-1 block w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="text-sm">
+                                <a href="#" class="font-medium text-blue-600 hover:text-blue-500">Forgot your password?</a>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white btn-primary">Sign in</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="dashboard-view" class="hidden">
+            <div class="flex h-screen bg-gray-100 dark:bg-slate-900">
+                <div id="sidebar" class="hidden md:flex flex-col w-64 bg-white dark:bg-gray-800 shadow-2xl transition-all duration-300">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-yjbGNmOkPV97VpEhrCzGiHkbK5xNhHTuPO7OewcLWz-EqPwidFwBmtLAs-kHHfYqHXo&usqp=CAU" class="srms-logo" alt="SRMS Logo">
+                    <div class="flex items-center justify-center h-16 border-b border-gray-200 dark:border-gray-700">
+                        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">SRMS Portal</h1>
+                    </div>
+                    <div class="flex flex-col flex-1 overflow-y-auto">
+                        <nav id="sidebar-nav" class="flex-1 px-2 py-4">
+                            <a href="#" data-target="dashboard" class="nav-link flex items-center px-4 py-2.5 text-gray-600 dark:text-gray-300 rounded-lg"><i class="fas fa-tachometer-alt w-6 text-center mr-3 text-gray-400"></i> Dashboard</a>
+                            <a href="#" data-target="academics" class="nav-link flex items-center px-4 py-2.5 mt-2 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg"><i class="fas fa-book-open w-6 text-center mr-3 text-gray-400"></i> Academics</a>
+                            <a href="#" data-target="college-info" class="nav-link flex items-center px-4 py-2.5 mt-2 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg"><i class="fas fa-university w-6 text-center mr-3 text-gray-400"></i> College Info</a>
+                            <a href="#" data-target="faculty" class="nav-link flex items-center px-4 py-2.5 mt-2 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg"><i class="fas fa-users w-6 text-center mr-3 text-gray-400"></i> Faculty</a>
+                            <a href="#" data-target="events" class="nav-link flex items-center px-4 py-2.5 mt-2 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg"><i class="fas fa-calendar-alt w-6 text-center mr-3 text-gray-400"></i> Events</a>
+                            <a href="#" data-target="event-details" class="nav-link flex items-center px-4 py-2.5 mt-2 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg"><i class="fas fa-info-circle w-6 text-center mr-3 text-gray-400"></i> Event Details</a>
+                            <a href="#" data-target="tiro" class="nav-link flex items-center px-4 py-2.5 mt-2 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg"><i class="fas fa-briefcase w-6 text-center mr-3 text-gray-400"></i> TYRO</a>
+                        </nav>
+                    </div>
+                </div>
+
+                <div class="flex flex-col flex-1 overflow-y-auto">
+                    <header class="flex items-center justify-between h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 z-10 sticky top-0">
+                        <div class="flex items-center px-4">
+                            <button id="menu-button" class="text-gray-500 dark:text-gray-300 focus:outline-none md:hidden"><i class="fas fa-bars text-xl"></i></button>
+                            <div class="relative mx-4 lg:mx-0"><span class="absolute inset-y-0 left-0 flex items-center pl-3"><i class="fas fa-search text-gray-500"></i></span><input class="w-32 pl-10 pr-4 py-2 text-sm text-gray-700 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 border rounded-md sm:w-64 focus:outline-none focus:ring-2 focus:ring-transparent focus:ring-blue-500 transition" type="text" placeholder="Search..."></div>
+                        </div>
+                        <div class="flex items-center pr-4">
+                            <button id="theme-toggle" class="text-gray-500 dark:text-gray-300 focus:outline-none mr-4 w-10 h-10 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center"><i class="fas fa-moon text-xl"></i></button>
+                            <button id="logout-button" title="Logout" class="text-gray-500 dark:text-gray-300 focus:outline-none mr-4 w-10 h-10 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center"><i class="fas fa-sign-out-alt text-xl"></i></button>
+                            <div class="relative"><button class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"><img class="h-9 w-9 rounded-full object-cover" src="https://placehold.co/100x100/000000/FFFFFF/png?text=S" alt="User avatar"></button></div>
+                        </div>
+                    </header>
+
+                    <main id="main-content" class="p-4 md:p-8">
+                        <div id="dashboard-content" class="page-view">
+                            <h1 class="text-4xl font-bold text-gray-800 dark:text-white">Welcome, Student!</h1>
+                            <p class="mt-2 text-gray-600 dark:text-gray-400">Here's a quick overview of your college journey.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl card-hover-effect cursor-pointer" data-target="academics"><div class="flex items-center"><i class="fas fa-book-open text-3xl text-blue-500"></i><div class="ml-4"><h3 class="text-xl font-bold">Academics</h3><p class="text-gray-600 dark:text-gray-400">Notes & lectures</p></div></div></div>
+                                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl card-hover-effect cursor-pointer" data-target="events"><div class="flex items-center"><i class="fas fa-calendar-alt text-3xl text-green-500"></i><div class="ml-4"><h3 class="text-xl font-bold">Events</h3><p class="text-gray-600 dark:text-gray-400">Fests & activities</p></div></div></div>
+                                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl card-hover-effect cursor-pointer" data-target="tiro"><div class="flex items-center"><i class="fas fa-briefcase text-3xl text-red-500"></i><div class="ml-4"><h3 class="text-xl font-bold">TYRO</h3><p class="text-gray-600 dark:text-gray-400"></p></div></div></div>
+                                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl card-hover-effect cursor-pointer" data-target="faculty"><div class="flex items-center"><i class="fas fa-users text-3xl text-yellow-500"></i><div class="ml-4"><h3 class="text-xl font-bold">Faculty</h3><p class="text-gray-600 dark:text-gray-400">Professors</p></div></div></div>
+                                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl card-hover-effect cursor-pointer" data-target="event-details"><div class="flex items-center"><i class="fas fa-info-circle text-3xl text-purple-500"></i><div class="ml-4"><h3 class="text-xl font-bold">Event Details</h3><p class="text-gray-600 dark:text-gray-400">Event ki jaankari</p></div></div></div>
+                            </div>
+                        </div>
+
+                        <div id="academics-content" class="page-view hidden">
+                            <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Academics</h1>
+                            <p class="mt-2 text-gray-600 dark:text-gray-400">Find all your subject notes, lectures, and resources here.</p>
+                            <div class="mt-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                <div class="flex items-center gap-4">
+                                    <label for="semester-filter" class="text-sm font-medium">Semester:</label>
+                                    <select id="semester-filter" class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option>Semester 1</option><option>Semester 2</option>
+                                </div>
+                                <div class="relative">
+                                    <input type="text" id="academics-search" placeholder="Search by subject or faculty..." class="w-full md:w-64 pl-4 pr-10 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                </div>
+                            </div>
+                            <div id="academics-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                                <div class="subject-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md card-hover-effect" data-keywords="engineering mathematics-i dr. anuj kumar"><h3 class="text-xl font-bold text-blue-500">Engineering Mathematics-I</h3><p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Dr. Anuj Kumar</p><p class="mt-4 text-gray-700 dark:text-gray-300">Core concepts of calculus, matrices, and differential equations.</p><div class="mt-6 flex justify-between items-center"><span class="text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded-full">CS/IT/EC</span><div class="flex gap-3"><a href="#" title="View Notes"><i class="fas fa-file-pdf text-xl text-red-500 hover:text-red-600"></i></a><a href="#" title="Watch Lectures"><i class="fab fa-youtube text-xl text-red-600 hover:text-red-700"></i></a><a href="#" title="Google Drive"><i class="fab fa-google-drive text-xl text-green-500 hover:text-green-600"></i></a></div></div></div>
+                                <div class="subject-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md card-hover-effect" data-keywords="programming for problem solving prof. shweta sharma"><h3 class="text-xl font-bold text-green-500">Programming for Problem Solving</h3><p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Prof. Shweta Sharma</p><p class="mt-4 text-gray-700 dark:text-gray-300">Introduction to C programming, loops, arrays, and functions.</p><div class="mt-6 flex justify-between items-center"><span class="text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded-full">CS/IT</span><div class="flex gap-3"><a href="#" title="View Notes"><i class="fas fa-file-pdf text-xl text-red-500 hover:text-red-600"></i></a><a href="#" title="Watch Lectures"><i class="fab fa-youtube text-xl text-red-600 hover:text-red-700"></i></a><a href="#" title="Google Drive"><i class="fab fa-google-drive text-xl text-green-500 hover:text-green-600"></i></a></div></div></div>
+                                <div class="subject-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md card-hover-effect" data-keywords="basic electrical engineering er. ritesh kumar"><h3 class="text-xl font-bold text-yellow-500">Basic Electrical Engineering</h3><p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Er. Ritesh Kumar</p><p class="mt-4 text-gray-700 dark:text-gray-300">Fundamentals of circuits, AC/DC, and electrical machines.</p><div class="mt-6 flex justify-between items-center"><span class="text-xs font-semibold bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 px-2 py-1 rounded-full">CS/IT/EC/ME</span><div class="flex gap-3"><a href="#" title="View Notes"><i class="fas fa-file-pdf text-xl text-red-500 hover:text-red-600"></i></a><a href="#" title="Watch Lectures"><i class="fab fa-youtube text-xl text-red-600 hover:text-red-700"></i></a></div></div></div>
+                                <div class="subject-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md card-hover-effect" data-keywords="environmental science dr. priya singh"><h3 class="text-xl font-bold text-teal-500">Environmental Science</h3><p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Dr. Priya Singh</p><p class="mt-4 text-gray-700 dark:text-gray-300">Study of environment, ecosystems, and sustainable practices.</p><div class="mt-6 flex justify-between items-center"><span class="text-xs font-semibold bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200 px-2 py-1 rounded-full">All Branches</span><div class="flex gap-3"><a href="#" title="View Notes"><i class="fas fa-file-pdf text-xl text-red-500 hover:text-red-600"></i></a><a href="#" title="Watch Lectures"><i class="fab fa-youtube text-xl text-red-600 hover:text-red-700"></i></a></div></div></div>
+                                <div class="subject-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md card-hover-effect" data-keywords="engineering physics dr. sameer verma"><h3 class="text-xl font-bold text-purple-500">Engineering Physics</h3><p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Dr. Sameer Verma</p><p class="mt-4 text-gray-700 dark:text-gray-300">Quantum mechanics, optics, and semiconductor physics.</p><div class="mt-6 flex justify-between items-center"><span class="text-xs font-semibold bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 px-2 py-1 rounded-full">CS/IT/EC/ME</span><div class="flex gap-3"><a href="#" title="View Notes"><i class="fas fa-file-pdf text-xl text-red-500 hover:text-red-600"></i></a><a href="#" title="Watch Lectures"><i class="fab fa-youtube text-xl text-red-600 hover:text-red-700"></i></a><a href="#" title="Google Drive"><i class="fab fa-google-drive text-xl text-green-500 hover:text-green-600"></i></a></div></div></div>
+                                <div class="subject-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md card-hover-effect" data-keywords="fundamental of electronics prof. neha gupta"><h3 class="text-xl font-bold text-orange-500">Fundamental of Electronics</h3><p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Prof. Neha Gupta</p><p class="mt-4 text-gray-700 dark:text-gray-300">Basics of diodes, transistors, and operational amplifiers.</p><div class="mt-6 flex justify-between items-center"><span class="text-xs font-semibold bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 px-2 py-1 rounded-full">EC/CS/IT</span><div class="flex gap-3"><a href="#" title="View Notes"><i class="fas fa-file-pdf text-xl text-red-500 hover:text-red-600"></i></a><a href="#" title="Watch Lectures"><i class="fab fa-youtube text-xl text-red-600 hover:text-red-700"></i></a><a href="#" title="Google Drive"><i class="fab fa-google-drive text-xl text-green-500 hover:text-green-600"></i></a></div></div></div>
+                                <div class="subject-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md card-hover-effect" data-keywords="engineering chemistry dr. anuj kumar"><h3 class="text-xl font-bold text-blue-500">Engineering Chemistry</h3><p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Dr. Anuj Kumar</p><p class="mt-4 text-gray-700 dark:text-gray-300">Core concepts of calculus, matrices, and differential equations.</p><div class="mt-6 flex justify-between items-center"><span class="text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded-full">CS/IT/EC</span><div class="flex gap-3"><a href="#" title="View Notes"><i class="fas fa-file-pdf text-xl text-red-500 hover:text-red-600"></i></a><a href="#" title="Watch Lectures"><i class="fab fa-youtube text-xl text-red-600 hover:text-red-700"></i></a><a href="#" title="Google Drive"><i class="fab fa-google-drive text-xl text-green-500 hover:text-green-600"></i></a></div></div></div>
+                                <div class="subject-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md card-hover-effect" data-keywords="fundamentals of mechanical engineering dr. anuj kumar"><h3 class="text-xl font-bold text-blue-500">Fundamentals of Mechanical Engineering</h3><p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Dr. Anuj Kumar</p><p class="mt-4 text-gray-700 dark:text-gray-300"></p><div class="mt-6 flex justify-between items-center"><span class="text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded-full">CS/IT/EC</span><div class="flex gap-3"><a href="#" title="View Notes"><i class="fas fa-file-pdf text-xl text-red-500 hover:text-red-600"></i></a><a href="#" title="Watch Lectures"><i class="fab fa-youtube text-xl text-red-600 hover:text-red-700"></i></a><a href="#" title="Google Drive"><i class="fab fa-google-drive text-xl text-green-500 hover:text-green-600"></i></a></div></div></div>
+                                <div class="subject-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md card-hover-effect" data-keywords="soft skill dr. anuj kumar"><h3 class="text-xl font-bold text-blue-500">Soft Skill</h3><p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Dr. Anuj Kumar</p><p class="mt-4 text-gray-700 dark:text-gray-300">Core concepts of calculus, matrices, and differential equations.</p><div class="mt-6 flex justify-between items-center"><span class="text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded-full">CS/IT/EC</span><div class="flex gap-3"><a href="#" title="View Notes"><i class="fas fa-file-pdf text-xl text-red-500 hover:text-red-600"></i></a><a href="#" title="Watch Lectures"><i class="fab fa-youtube text-xl text-red-600 hover:text-red-700"></i></a><a href="#" title="Google Drive"><i class="fab fa-google-drive text-xl text-green-500 hover:text-green-600"></i></a></div></div></div>
+                                <div class="subject-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md card-hover-effect" data-keywords="engineering mathematics-2 dr. anuj kumar"><h3 class="text-xl font-bold text-blue-500">Engineering Mathematics-2</h3><p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Dr. Anuj Kumar</p><p class="mt-4 text-gray-700 dark:text-gray-300">Core concepts of calculus, matrices, and differential equations.</p><div class="mt-6 flex justify-between items-center"><span class="text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded-full">CS/IT/EC</span><div class="flex gap-3"><a href="#" title="View Notes"><i class="fas fa-file-pdf text-xl text-red-500 hover:text-red-600"></i></a><a href="#" title="Watch Lectures"><i class="fab fa-youtube text-xl text-red-600 hover:text-red-700"></i></a><a href="#" title="Google Drive"><i class="fab fa-google-drive text-xl text-green-500 hover:text-green-600"></i></a></div></div></div>
+                                <div class="subject-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md card-hover-effect" data-keywords="engineering mathematics-i dr. anuj kumar"><h3 class="text-xl font-bold text-blue-500">Engineering Mathematics-I</h3><p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Dr. Anuj Kumar</p><p class="mt-4 text-gray-700 dark:text-gray-300">Core concepts of calculus, matrices, and differential equations.</p><div class="mt-6 flex justify-between items-center"><span class="text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded-full">CS/IT/EC</span><div class="flex gap-3"><a href="#" title="View Notes"><i class="fas fa-file-pdf text-xl text-red-500 hover:text-red-600"></i></a><a href="#" title="Watch Lectures"><i class="fab fa-youtube text-xl text-red-600 hover:text-red-700"></i></a><a href="#" title="Google Drive"><i class="fab fa-google-drive text-xl text-green-500 hover:text-green-600"></i></a></div></div></div>
+                            </div>
+                             <div id="no-subject-found" class="hidden text-center mt-8"><p class="text-xl text-gray-500">No subjects found matching your search.</p></div>
+                        </div>
+
+                        <div id="events-content" class="page-view hidden">
+                            <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Events & Activities</h1>
+                            <p class="mt-2 text-gray-600 dark:text-gray-400">Participate in college events and fests.</p>
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+                                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg"><h2 class="text-2xl font-bold text-blue-500 border-b-2 border-blue-500 pb-2">Tech Events</h2><div class="space-y-4 mt-4"><div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-md"><h3 class="font-semibold">CodeClash 2025</h3><p class="text-sm text-gray-500 dark:text-gray-400">Aug 15, 2025</p><button data-event-name="CodeClash 2025" class="register-btn mt-2 w-full btn-primary text-white py-2 rounded-md">Register</button></div><div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-md"><h3 class="font-semibold">RoboWars</h3><p class="text-sm text-gray-500 dark:text-gray-400">Sep 01, 2025</p><button data-event-name="RoboWars" class="register-btn mt-2 w-full btn-primary text-white py-2 rounded-md">Register</button></div></div></div>
+                                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg"><h2 class="text-2xl font-bold text-green-500 border-b-2 border-green-500 pb-2">Cultural Events</h2><div class="space-y-4 mt-4"><div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-md"><h3 class="font-semibold">Spandan - Annual Fest</h3><p class="text-sm text-gray-500 dark:text-gray-400">Oct 10, 2025</p><button data-event-name="Spandan - Annual Fest" class="register-btn mt-2 w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600">Register</button></div></div></div>
+                                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg"><h2 class="text-2xl font-bold text-red-500 border-b-2 border-red-500 pb-2">Fest Events</h2><div class="space-y-4 mt-4"><div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-md"><h3 class="font-semibold">Zest - Sports Fest</h3><p class="text-sm text-gray-500 dark:text-gray-400">Nov 20, 2025</p><button data-event-name="Zest - Sports Fest" class="register-btn mt-2 w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600">Register</button></div></div></div>
+                            </div>
+                        </div>
+
+                        <div id="event-details-content" class="page-view hidden">
+                            <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Event Details</h1>
+                            <p class="mt-2 text-gray-600 dark:text-gray-400"></p>
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+                                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                                    <h2 class="text-2xl font-bold text-blue-500 border-b-2 border-blue-500 pb-2">Tech Events</h2>
+                                    <div class="space-y-4 mt-4">
+                                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+                                            <h3 class="font-semibold">Tech Gallary</h3>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Nov 15, 2025</p>
+                                            <p class="text-sm mt-2 text-gray-600 dark:text-gray-300">A competitive programming contest for all students.</p>
+                                        </div>
+                                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+                                            <h3 class="font-semibold">RoboWars</h3>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Sep 01, 2025</p>
+                                            <p class="text-sm mt-2 text-gray-600 dark:text-gray-300">Build and battle your robots in this exciting competition.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                                    <h2 class="text-2xl font-bold text-green-500 border-b-2 border-green-500 pb-2">Cultural Events</h2>
+                                    <div class="space-y-4 mt-4">
+                                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+                                            <h3 class="font-semibold">Spandan - Annual Fest</h3>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Oct 10, 2025</p>
+                                            <p class="text-sm mt-2 text-gray-600 dark:text-gray-300">The biggest cultural extravaganza of the year.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                                    <h2 class="text-2xl font-bold text-red-500 border-b-2 border-red-500 pb-2">Fest Events</h2>
+                                    <div class="space-y-4 mt-4">
+                                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+                                            <h3 class="font-semibold">Zest - Sports Fest</h3>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Nov 20, 2025</p>
+                                            <p class="text-sm mt-2 text-gray-600 dark:text-gray-300">Get ready for a week of intense sporting action.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="faculty-content" class="page-view hidden">
+                            <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Faculty Directory</h1>
+                            <p class="mt-2 text-gray-600 dark:text-gray-400">Find your professors and their details here.</p>
+                            <div class="mt-8"><div class="relative"><input type="text" id="faculty-search" placeholder="Search by name, department, or subject..." class="w-full pl-4 pr-10 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"><i class="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i></div></div>
+                            <div id="faculty-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
+                                <div class="faculty-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center card-hover-effect" data-keywords="prof ritu singh hod b.tech first year engineering maths data structures"><img class="w-28 h-28 mx-auto rounded-full -mt-16 border-4 border-white dark:border-gray-700" src="https://placehold.co/150x150/667eea/FFFFFF/png?text=RS" alt="Prof. Ritu Singh"><h3 class="text-xl font-bold mt-4">Prof. Ritu Singh</h3><p class="text-gray-500 dark:text-gray-400">Ph.D, M.Tech (HOD, B.tech First year)</p><div class="mt-4"><p class="font-semibold text-gray-700 dark:text-gray-300">Subjects:</p><p class="text-sm text-blue-500">Environmentals science and Engineering Chemistry</p></div><div class="mt-4 flex justify-center gap-4"><a href="mailto:ritu.s@srms.ac.in" class="text-gray-500 hover:text-blue-500"><i class="fas fa-envelope text-xl"></i></a><a href="#" class="text-gray-500 hover:text-blue-500"><i class="fab fa-linkedin text-xl"></i></a></div></div>
+                                <div class="faculty-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center card-hover-effect" data-keywords="prof ashutosh pandey cse c programming web tech"><img class="w-28 h-28 mx-auto rounded-full -mt-16 border-4 border-white dark:border-gray-700" src="https://placehold.co/150x150/794acf/FFFFFF/png?text=AP" alt="Prof. Ashutosh Pandey"><h3 class="text-xl font-bold mt-4">Prof. Ashutosh Pandey</h3><p class="text-gray-500 dark:text-gray-400">M.Tech (CSE)</p><div class="mt-4"><p class="font-semibold text-gray-700 dark:text-gray-300">Subjects:</p><p class="text-sm text-green-500">Engineering Physics</p></div><div class="mt-4 flex justify-center gap-4"><a href="mailto:ashutosh.p@srms.ac.in" class="text-gray-500 hover:text-blue-500"><i class="fas fa-envelope text-xl"></i></a><a href="#" class="text-gray-500 hover:text-blue-500"><i class="fab fa-linkedin text-xl"></i></a></div></div>
+                                <div class="faculty-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center card-hover-effect" data-keywords="er ritesh kumar ee electrical"><img class="w-28 h-28 mx-auto rounded-full -mt-16 border-4 border-white dark:border-gray-700" src="https://placehold.co/150x150/d97706/FFFFFF/png?text=RK" alt="Er. Ritesh Kumar"><h3 class="text-xl font-bold mt-4"></h3><p class="text-gray-500 dark:text-gray-400">M.Tech (EE)</p><div class="mt-4"><p class="font-semibold text-gray-700 dark:text-gray-300">Subjects:</p><p class="text-sm text-yellow-500">Basic Electrical, Machines</p></div><div class="mt-4 flex justify-center gap-4"><a href="mailto:ritesh.k@srms.ac.in" class="text-gray-500 hover:text-blue-500"><i class="fas fa-envelope text-xl"></i></a><a href="#" class="text-gray-500 hover:text-blue-500"><i class="fab fa-linkedin text-xl"></i></a></div></div>
+                            </div>
+                            <div id="no-faculty-found" class="hidden text-center mt-8"><p class="text-xl text-gray-500">No faculty found matching your search.</p></div>
+                        </div>
+
+                        <div id="tiro-content" class="page-view hidden">
+                             <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Meet the TYRO Team</h1>
+                             <p class="mt-2 text-gray-600 dark:text-gray-400"></p>
+                             <div class="mt-12">
+                                 <h2 class="text-2xl font-bold text-center text-blue-500"></h2>
+                                 <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-10 max-w-4xl mx-auto">
+                                     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl text-center card-hover-effect"><img class="w-32 h-32 mx-auto rounded-full border-4 border-blue-500" src="https://placehold.co/200x200/3b82f6/FFFFFF/png?text=PS" alt="TIRO President"><h3 class="text-2xl font-bold mt-4">Pratiksha Singh</h3><p class="text-blue-500 font-semibold">TIRO President</p><p class="text-sm text-gray-500 dark:text-gray-400 mt-2">"Organizing All the college Events"</p><div class="mt-4 flex justify-center gap-4"><a href="#" class="text-gray-500 hover:text-blue-500"><i class="fab fa-linkedin text-2xl"></i></a><a href="mailto:pratiksha.s@srmscet.ac.in" class="text-gray-500 hover:text-blue-500"><i class="fas fa-envelope text-2xl"></i></a></div></div>
+                                     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl text-center card-hover-effect"><img class="w-32 h-32 mx-auto rounded-full border-4 border-green-500" src="https://placehold.co/200x200/10b981/FFFFFF/png?text=RV" alt="TIRO Secretary"><h3 class="text-2xl font-bold mt-4">Rishabh Verma</h3><p class="text-green-500 font-semibold">TIRO Secretary</p><p class="text-sm text-gray-500 dark:text-gray-400 mt-2">"Organizing All the college Events"</p><div class="mt-4 flex justify-center gap-4"><a href="#" class="text-gray-500 hover:text-green-500"><i class="fab fa-linkedin text-2xl"></i></a><a href="mailto:rishabh.v@srmscet.ac.in" class="text-gray-500 hover:text-green-500"><i class="fas fa-envelope text-2xl"></i></a></div></div>
+                                 </div>
+                             </div>
+                             <div class="mt-16">
+                                 <h2 class="text-2xl font-bold text-center text-yellow-500">Core Team Members</h2>
+                                 <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                                     <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-lg text-center card-hover-effect"><img class="w-20 h-20 mx-auto rounded-full border-4 border-yellow-500" src="https://placehold.co/150x150/f59e0b/FFFFFF/png?text=RK" alt="Rohan Kumar"><h3 class="text-lg font-bold mt-3">Rohan Kumar</h3><p class="text-sm text-yellow-500">Placement Coordinator</p><div class="mt-3 flex justify-center gap-3"><a href="#" class="text-gray-400 hover:text-yellow-500"><i class="fab fa-linkedin"></i></a></div></div>
+                                     <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-lg text-center card-hover-effect"><img class="w-20 h-20 mx-auto rounded-full border-4 border-yellow-500" src="https://placehold.co/150x150/f59e0b/FFFFFF/png?text=SM" alt="Sneha Mehta"><h3 class="text-lg font-bold mt-3">Sneha Mehta</h3><p class="text-sm text-yellow-500">Internship Coordinator</p><div class="mt-3 flex justify-center gap-3"><a href="#" class="text-gray-400 hover:text-yellow-500"><i class="fab fa-linkedin"></i></a></div></div>
+                                     <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-lg text-center card-hover-effect"><img class="w-20 h-20 mx-auto rounded-full border-4 border-yellow-500" src="https://placehold.co/150x150/f59e0b/FFFFFF/png?text=VJ" alt="Vikram Joshi"><h3 class="text-lg font-bold mt-3">Vikram Joshi</h3><p class="text-sm text-yellow-500">Corporate Relations</p><div class="mt-3 flex justify-center gap-3"><a href="#" class="text-gray-400 hover:text-yellow-500"><i class="fab fa-linkedin"></i></a></div></div>
+                                     <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-lg text-center card-hover-effect"><img class="w-20 h-20 mx-auto rounded-full border-4 border-yellow-500" src="https://placehold.co/150x150/f59e0b/FFFFFF/png?text=AG" alt="Anjali Gupta"><h3 class="text-lg font-bold mt-3">Anjali Gupta</h3><p class="text-sm text-yellow-500">Workshop Manager</p><div class="mt-3 flex justify-center gap-3"><a href="#" class="text-gray-400 hover:text-yellow-500"><i class="fab fa-linkedin"></i></a></div></div>
+                                 </div>
+                             </div>
+                        </div>
+
+                        <div id="college-info-content" class="page-view hidden">
+                             <h1 class="text-3xl font-bold text-gray-800 dark:text-white">About SRMS Institutions</h1>
+                             <p class="mt-2 text-gray-600 dark:text-gray-400">All you need to know about your college.</p>
+                             <div class="mt-8 border-b border-gray-200 dark:border-gray-700">
+                                 <nav id="info-tabs" class="flex -mb-px space-x-6 overflow-x-auto">
+                                     <a class="info-tab whitespace-nowrap text-gray-500 dark:text-gray-400 py-3 px-1 active" data-infotarget="about">About SRMS</a>
+                                     <a class="info-tab whitespace-nowrap text-gray-500 dark:text-gray-400 py-3 px-1" data-infotarget="achievements">Achievements</a>
+                                     <a class="info-tab whitespace-nowrap text-gray-500 dark:text-gray-400 py-3 px-1" data-infotarget="fests">Fest Highlights</a>
+                                     <a class="info-tab whitespace-nowrap text-gray-500 dark:text-gray-400 py-3 px-1" data-infotarget="placements">Placements</a>
+                                 </nav>
+                             </div>
+                             <div class="mt-8">
+                                 <div id="about-content" class="info-content active"><h3 class="text-2xl font-semibold mb-4">Our Vision & Mission</h3><p class="text-gray-700 dark:text-gray-300 leading-relaxed">To develop a learning environment that is driven by the spirit of entrepreneurship and innovation, and to create professionals with a sense of social responsibility. Our mission is to provide quality education, foster research and development, and build strong industry-academia linkages.</p></div>
+                                 <div id="achievements-content" class="info-content"><h3 class="text-2xl font-semibold mb-4">Our Achievements</h3><ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300"><li>Ranked among the Top 50 Engineering Colleges in India by NIRF.</li><li>Awarded 'Best Engineering College in UP' by Times Group.</li><li>Winners of Smart India Hackathon for 3 consecutive years.</li></ul></div>
+                                 <div id="fests-content" class="info-content"><h3 class="text-2xl font-semibold mb-4">Fest Highlights</h3><div><h4 class="text-xl font-semibold text-red-500 mb-2">Zest Highlights</h4><div class="grid grid-cols-2 md:grid-cols-4 gap-4"><img src="https://placehold.co/600x400/ef4444/ffffff?text=Zest+Event+1" class="rounded-lg shadow-md" alt="Zest Highlight 1"><img src="https://placehold.co/600x400/ef4444/ffffff?text=Zest+Event+2" class="rounded-lg shadow-md" alt="Zest Highlight 2"></div><h4 class="text-xl font-semibold text-blue-500 mt-6 mb-2">Techvyom Highlights</h4><div class="grid grid-cols-2 md:grid-cols-4 gap-4"><img src="https://placehold.co/600x400/3b82f6/ffffff?text=Techvyom+1" class="rounded-lg shadow-md" alt="Techvyom Highlight 1"><img src="https://placehold.co/600x400/3b82f6/ffffff?text=Techvyom+2" class="rounded-lg shadow-md" alt="Techvyom Highlight 2"></div></div></div>
+                                 <div id="placements-content" class="info-content"><h3 class="text-2xl font-semibold mb-4">Our Top Recruiters</h3><div class="p-6 bg-white dark:bg-gray-800 rounded-lg"><div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-8 items-center"><img src="https://logo.clearbit.com/tcs.com" alt="TCS Logo" class="h-12 w-auto mx-auto grayscale hover:grayscale-0 transition duration-300" onerror="this.style.display='none'"><img src="https://logo.clearbit.com/infosys.com" alt="Infosys Logo" class="h-12 w-auto mx-auto grayscale hover:grayscale-0 transition duration-300" onerror="this.style.display='none'"><img src="https://logo.clearbit.com/wipro.com" alt="Wipro Logo" class="h-12 w-auto mx-auto grayscale hover:grayscale-0 transition duration-300" onerror="this.style.display='none'"><img src="https://logo.clearbit.com/capgemini.com" alt="Capgemini Logo" class="h-12 w-auto mx-auto grayscale hover:grayscale-0 transition duration-300" onerror="this.style.display='none'"><img src="https://logo.clearbit.com/accenture.com" alt="Accenture Logo" class="h-12 w-auto mx-auto grayscale hover:grayscale-0 transition duration-300" onerror="this.style.display='none'"><img src="https://logo.clearbit.com/cognizant.com" alt="Cognizant Logo" class="h-12 w-auto mx-auto grayscale hover:grayscale-0 transition duration-300" onerror="this.style.display='none'"></div></div></div>
+                             </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="registration-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto modal-animate">
+            <h2 id="modal-title" class="text-2xl font-bold mb-4">Register for Event</h2>
+            <form id="registration-form">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Registration Type</label>
+                    <div class="mt-2 flex gap-4">
+                        <label class="flex items-center"><input type="radio" name="reg_type" value="individual" class="form-radio text-blue-600" checked> <span class="ml-2">Individual</span></label>
+                        <label class="flex items-center"><input type="radio" name="reg_type" value="team" class="form-radio text-blue-600"> <span class="ml-2">Team</span></label>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Aapka/Team Leader ka Naam</label>
+                    <input type="text" id="name" class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md" required>
+                </div>
+                <div class="mb-4 p-4 border border-dashed dark:border-gray-600 rounded-md">
+                    <label for="aadhaar" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Aadhaar Verification</label>
+                    <div class="flex items-center gap-2 mt-2">
+                        <input type="text" id="aadhaar" placeholder="Aadhaar Number" class="flex-grow px-3 py-2 bg-white dark:bg-gray-700 border rounded-md">
+                        <button type="button" id="send-otp-btn" class="px-4 py-2 bg-gray-500 text-white rounded-md text-sm w-28 text-center">Send OTP</button>
+                    </div>
+                    <div id="otp-section" class="hidden mt-2">
+                        <input type="text" id="otp" placeholder="Enter OTP" class="w-full px-3 py-2 bg-white dark:bg-gray-700 border rounded-md" disabled>
+                        <p id="otp-message" class="text-xs text-green-500 mt-1"></p>
+                    </div>
+                </div>
+                <div id="team-members-section" class="hidden mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Team Members</label>
+                    <div id="team-members-container" class="mt-2 space-y-2"></div>
+                    <button type="button" id="add-member-btn" class="mt-2 text-sm text-blue-500 hover:underline">+ Add Member</button>
+                </div>
+                <div class="flex justify-end gap-4 mt-6">
+                    <button type="button" id="close-modal-btn" class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded-md">Cancel</button>
+                    <button type="submit" class="px-6 py-2 btn-primary text-white rounded-md">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="toast" class="fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg transform translate-x-[120%] transition-transform duration-500">
+        <p id="toast-message">Registration Successful!</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const { jsPDF } = window.jspdf;
+            
+            const app = {
+                entryView: document.getElementById('entry-view'),
+                studentLoginView: document.getElementById('student-login-view'),
+                studentRegistrationView: document.getElementById('student-registration-view'),
+                adminLoginView: document.getElementById('admin-login-view'),
+                dashboardView: document.getElementById('dashboard-view'),
+                
+                showStudentLoginBtn: document.getElementById('show-student-login'),
+                showStudentRegistrationBtn: document.getElementById('show-student-registration'),
+                showAdminLoginBtn: document.getElementById('show-admin-login'),
+                backToEntryBtns: document.querySelectorAll('.back-to-entry'),
+                
+                loginForms: document.querySelectorAll('.login-form'),
+                registrationForm: document.getElementById('registration-form-main'),
+                logoutButton: document.getElementById('logout-button'),
+                
+                menuButton: document.getElementById('menu-button'),
+                sidebar: document.getElementById('sidebar'),
+                themeToggle: document.getElementById('theme-toggle'),
+                html: document.documentElement,
+                sidebarNav: document.getElementById('sidebar-nav'),
+                mainContent: document.getElementById('main-content'),
+                toast: document.getElementById('toast'),
+                toastMessage: document.getElementById('toast-message'),
+            };
+
+            const showView = (viewToShow) => {
+                [app.entryView, app.studentLoginView, app.adminLoginView, app.dashboardView, app.studentRegistrationView].forEach(view => {
+                    view.classList.add('hidden');
+                });
+                viewToShow.classList.remove('hidden');
+                viewToShow.classList.add('fade-in');
+                
+                if(viewToShow === app.dashboardView) {
+                    document.title = "SRMS College Portal - Dashboard";
+                    showDashboardPage('dashboard');
+                } else if (viewToShow === app.studentLoginView) {
+                    document.title = "SRMS Portal - Student Login";
+                } else if (viewToShow === app.studentRegistrationView) {
+                    document.title = "SRMS Portal - Student Registration";
+                } else if (viewToShow === app.adminLoginView) {
+                    document.title = "SRMS Portal - Admin Login";
+                } else {
+                    document.title = "SRMS College Portal - Welcome";
+                }
+            };
+
+            app.showStudentLoginBtn.addEventListener('click', () => showView(app.studentLoginView));
+            app.showStudentRegistrationBtn.addEventListener('click', () => showView(app.studentRegistrationView));
+            app.showAdminLoginBtn.addEventListener('click', () => showView(app.adminLoginView));
+            app.backToEntryBtns.forEach(btn => btn.addEventListener('click', () => showView(app.entryView)));
+            app.logoutButton.addEventListener('click', () => showView(app.entryView));
+
+            app.loginForms.forEach(form => {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const email = form.email.value;
+                    const password = form.password.value;
+                    if (email && password) {
+                        showView(app.dashboardView);
+                    } else {
+                        form.parentElement.classList.add('shake');
+                        setTimeout(() => form.parentElement.classList.remove('shake'), 500);
+                    }
+                });
+            });
+
+            app.registrationForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const password = e.target.password.value;
+                const confirmPassword = e.target.confirm_password.value;
+
+                if (password !== confirmPassword) {
+                    showToast("Passwords do not match!", true);
+                    e.target.password.parentElement.classList.add('shake');
+                    e.target.confirm_password.parentElement.classList.add('shake');
+                    setTimeout(() => {
+                         e.target.password.parentElement.classList.remove('shake');
+                         e.target.confirm_password.parentElement.classList.remove('shake');
+                    }, 500);
+                    return;
+                }
+                
+                showToast("Registration successful! Please log in.");
+                showView(app.studentLoginView);
+            });
+
+            const updateThemeIcon = () => {
+                app.themeToggle.innerHTML = app.html.classList.contains('dark') ? '<i class="fas fa-sun text-xl text-yellow-400"></i>' : '<i class="fas fa-moon text-xl"></i>';
+            };
+            app.themeToggle.addEventListener('click', () => {
+                app.html.classList.toggle('dark');
+                updateThemeIcon();
+            });
+            app.menuButton.addEventListener('click', () => app.sidebar.classList.toggle('hidden'));
+
+            const pageViews = app.mainContent.querySelectorAll('.page-view');
+            const navLinks = app.sidebarNav.querySelectorAll('.nav-link');
+            function showDashboardPage(targetId) {
+                pageViews.forEach(page => page.classList.add('hidden'));
+                const targetPage = document.getElementById(`${targetId}-content`);
+                if (targetPage) {
+                    targetPage.classList.remove('hidden');
+                    targetPage.classList.add('fade-in');
+                }
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.dataset.target === targetId) link.classList.add('active');
+                });
+                if (window.innerWidth < 768) {
+                    app.sidebar.classList.add('hidden');
+                }
+            }
+            app.sidebarNav.addEventListener('click', (e) => {
+                const link = e.target.closest('.nav-link');
+                if (link) { e.preventDefault(); showDashboardPage(link.dataset.target); }
+            });
+            app.mainContent.addEventListener('click', (e) => {
+                const card = e.target.closest('[data-target]');
+                if(card && !e.target.closest('a, button')) { e.preventDefault(); showDashboardPage(card.dataset.target); }
+            });
+
+            const infoTabsContainer = document.getElementById('info-tabs');
+            if (infoTabsContainer) {
+                const infoTabs = infoTabsContainer.querySelectorAll('.info-tab');
+                const infoContents = document.querySelectorAll('.info-content');
+                infoTabsContainer.addEventListener('click', (e) => {
+                    const tab = e.target.closest('.info-tab');
+                    if (!tab) return;
+                    const targetId = tab.dataset.infotarget;
+                    infoTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    infoContents.forEach(content => {
+                        content.classList.toggle('active', content.id === `${targetId}-content`);
+                    });
+                });
+            }
+
+            const setupSearch = (inputId, gridId, cardSelector, noResultId) => {
+                const searchInput = document.getElementById(inputId);
+                if (!searchInput) return;
+                const grid = document.getElementById(gridId);
+                const cards = grid.querySelectorAll(cardSelector);
+                const noResultEl = document.getElementById(noResultId);
+                searchInput.addEventListener('keyup', (e) => {
+                    const searchTerm = e.target.value.toLowerCase().trim();
+                    let foundOne = false;
+                    cards.forEach(card => {
+                        const keywords = card.dataset.keywords.toLowerCase();
+                        const isVisible = keywords.includes(searchTerm);
+                        card.style.display = isVisible ? '' : 'none';
+                        if(isVisible) foundOne = true;
+                    });
+                    noResultEl.classList.toggle('hidden', foundOne);
+                });
+            };
+
+            setupSearch('faculty-search', 'faculty-grid', '.faculty-card', 'no-faculty-found');
+            setupSearch('academics-search', 'academics-grid', '.subject-card', 'no-subject-found');
+
+            const modal = document.getElementById('registration-modal');
+            const eventRegistrationForm = document.getElementById('registration-form');
+            let currentRegisterBtn = null;
+
+            app.mainContent.addEventListener('click', (e) => {
+                if (e.target.classList.contains('register-btn')) {
+                    currentRegisterBtn = e.target;
+                    if (currentRegisterBtn.classList.contains('registered')) {
+                        downloadReceipt(
+                            currentRegisterBtn.dataset.eventName,
+                            currentRegisterBtn.dataset.registrantName,
+                            currentRegisterBtn.dataset.regCode,
+                            JSON.parse(currentRegisterBtn.dataset.teamMembers || '[]')
+                        );
+                    } else {
+                        modal.querySelector('#modal-title').textContent = `Register for ${currentRegisterBtn.dataset.eventName}`;
+                        eventRegistrationForm.reset();
+                        document.getElementById('team-members-section').classList.add('hidden');
+                        document.getElementById('team-members-container').innerHTML = '';
+                        document.getElementById('otp-section').classList.add('hidden');
+                        document.getElementById('otp').disabled = true;
+                        document.getElementById('send-otp-btn').textContent = "Send OTP";
+                        modal.classList.remove('hidden');
+                    }
+                }
+            });
+            
+            document.getElementById('close-modal-btn').addEventListener('click', () => modal.classList.add('hidden'));
+
+            document.getElementById('send-otp-btn').addEventListener('click', (e) => {
+                const otpSection = document.getElementById('otp-section');
+                const otpInput = document.getElementById('otp');
+                const otpMessage = document.getElementById('otp-message');
+                const dummyOtp = Math.floor(1000 + Math.random() * 9000);
+                console.log(`OTP for verification (for testing): ${dummyOtp}`);
+                otpMessage.textContent = `Ek dummy OTP ( ${dummyOtp} ) console mein bheja gaya hai.`;
+                otpSection.classList.remove('hidden');
+                otpInput.disabled = false;
+                e.target.textContent = "Resend OTP";
+            });
+
+            eventRegistrationForm.reg_type.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const teamSection = document.getElementById('team-members-section');
+                    if (e.target.value === 'team') {
+                        teamSection.classList.remove('hidden');
+                        if (document.getElementById('team-members-container').childElementCount === 0) {
+                            addTeamMemberInput();
+                        }
+                    } else {
+                        teamSection.classList.add('hidden');
+                    }
+                });
+            });
+
+            function addTeamMemberInput() {
+                const container = document.getElementById('team-members-container');
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'team-member-input mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md';
+                input.placeholder = `Member ${container.childElementCount + 1} ka naam`;
+                container.appendChild(input);
+            }
+            document.getElementById('add-member-btn').addEventListener('click', addTeamMemberInput);
+
+            eventRegistrationForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const eventName = currentRegisterBtn.dataset.eventName;
+                const regType = e.target.reg_type.value;
+                const registrantName = e.target.name.value;
+                let regCode = '';
+                let teamMembers = [];
+
+                if (regType === 'team') {
+                    regCode = `TID-${Math.floor(1000 + Math.random() * 9000)}`;
+                    document.querySelectorAll('.team-member-input').forEach(input => {
+                        if (input.value) teamMembers.push(input.value);
+                    });
+                } else {
+                    regCode = `PID-${Math.floor(10000 + Math.random() * 90000)}`;
+                }
+
+                currentRegisterBtn.textContent = 'Download Receipt';
+                currentRegisterBtn.classList.add('registered', 'bg-gray-500');
+                currentRegisterBtn.classList.remove('btn-primary', 'bg-green-500', 'bg-red-500');
+                currentRegisterBtn.dataset.registrantName = registrantName;
+                currentRegisterBtn.dataset.regCode = regCode;
+                currentRegisterBtn.dataset.teamMembers = JSON.stringify(teamMembers);
+                
+                modal.classList.add('hidden');
+                showToast(`Successfully registered for ${eventName}!`);
+                downloadReceipt(eventName, registrantName, regCode, teamMembers);
+            });
+            
+            function showToast(message, isError = false) {
+                app.toastMessage.textContent = message;
+                app.toast.classList.remove('bg-green-500', 'bg-red-500');
+                app.toast.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
+                app.toast.classList.remove('translate-x-[120%]');
+                setTimeout(() => {
+                    app.toast.classList.add('translate-x-[120%]');
+                }, 4000);
+            }
+
+            function downloadReceipt(eventName, registrantName, regCode, teamMembers = []) {
+                const doc = new jsPDF();
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const margin = 15;
+
+                doc.setDrawColor(60, 130, 246); 
+                doc.setLineWidth(1);
+                doc.rect(margin, margin, pageWidth - 2 * margin, pageHeight - 2 * margin);
+
+                doc.setFontSize(26);
+                doc.setFont("helvetica", "bold");
+                doc.setTextColor(40, 40, 40);
+                doc.text("SRMS College Portal", pageWidth / 2, margin + 25, { align: 'center' });
+
+                doc.setFontSize(18);
+                doc.setFont("helvetica", "normal");
+                doc.setTextColor(100, 100, 100);
+                doc.text("Event Participation Receipt", pageWidth / 2, margin + 35, { align: 'center' });
+
+                doc.setLineWidth(0.5);
+                doc.setDrawColor(200, 200, 200);
+                doc.line(margin + 5, margin + 45, pageWidth - margin - 5, margin + 45);
+
+                let yPosition = margin + 65;
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "bold");
+                doc.setTextColor(0, 0, 0);
+                doc.text("Event Name:", pageWidth / 2, yPosition, { align: 'center' });
+                
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(16);
+                doc.setTextColor(60, 130, 246);
+                doc.text(eventName, pageWidth / 2, yPosition + 10, { align: 'center' });
+
+                yPosition += 25;
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "bold");
+                doc.setTextColor(0, 0, 0);
+                doc.text("Registration ID:", pageWidth / 2, yPosition, { align: 'center' });
+                
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(16);
+                doc.setTextColor(60, 130, 246);
+                doc.text(regCode, pageWidth / 2, yPosition + 10, { align: 'center' });
+
+                yPosition += 25;
+
+                if (teamMembers.length > 0) {
+                    doc.setFontSize(14);
+                    doc.setFont("helvetica", "bold");
+                    doc.setTextColor(0, 0, 0);
+                    doc.text("Team Leader:", pageWidth / 2, yPosition, { align: 'center' });
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(12);
+                    doc.setTextColor(50, 50, 50);
+                    doc.text(registrantName, pageWidth / 2, yPosition + 7, { align: 'center' });
+
+                    yPosition += 20;
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(14);
+                    doc.setTextColor(0, 0, 0);
+                    doc.text("Team Members:", pageWidth / 2, yPosition, { align: 'center' });
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(12);
+                    teamMembers.forEach((member, index) => {
+                        doc.text(member, pageWidth / 2, yPosition + 7 + (index * 7), { align: 'center' });
+                    });
+                } else {
+                    doc.setFontSize(14);
+                    doc.setFont("helvetica", "bold");
+                    doc.setTextColor(0, 0, 0);
+                    doc.text("Participant Name:", pageWidth / 2, yPosition, { align: 'center' });
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(12);
+                    doc.setTextColor(50, 50, 50);
+                    doc.text(registrantName, pageWidth / 2, yPosition + 7, { align: 'center' });
+                }
+
+                const footerY = pageHeight - margin - 20;
+                doc.setLineWidth(0.5);
+                doc.setDrawColor(200, 200, 200);
+                doc.line(margin + 5, footerY - 5, pageWidth - margin - 5, footerY - 5);
+                
+                doc.setFontSize(10);
+                doc.setFont("helvetica", "italic");
+                doc.setTextColor(150, 150, 150);
+                doc.text("Thank you for registering! Please show this receipt at the event.", pageWidth / 2, footerY, { align: 'center' });
+                doc.text(`Generated on: ${new Date().toLocaleDateString()}`, pageWidth / 2, footerY + 7, { align: 'center' });
+
+                doc.save(`${eventName}-Receipt-${regCode}.pdf`);
+            }
+            
+            showView(app.entryView);
+            updateThemeIcon();
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - KMRL DIS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #111827;
+            --secondary-bg: #1f2937;
+            --tertiary-bg: #374151;
+            --border-color: #374151;
+            --text-primary: #d1d5db;
+            --text-secondary: #9ca3af;
+            --text-white: #ffffff;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--secondary-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        #sidebar {
+            background-color: var(--secondary-bg);
+            color: var(--text-primary);
+            width: 16rem;
+            display: flex;
+            flex-direction: column;
+            z-index: 20;
+            transition: width 0.3s ease-in-out;
+        }
+
+        #sidebar.collapsed {
+            width: 5rem;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            height: 4rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-header .logo {
+            width: 2rem;
+            height: 2rem;
+            margin-right: 0.5rem;
+            filter: brightness(0) invert(1);
+        }
+
+        #sidebar-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-white);
+            white-space: nowrap;
+        }
+
+        #sidebar-toggle {
+            color: var(--text-secondary);
+            transition: transform 0.3s;
+        }
+
+        #sidebar-toggle:hover {
+            color: var(--text-white);
+        }
+
+        #sidebar-toggle.rotated {
+            transform: rotate(180deg);
+        }
+
+        #sidebar-nav {
+            margin-top: 1rem;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            margin: 0.5rem 0.5rem 0;
+            color: var(--text-secondary);
+            border-radius: 0.5rem;
+            transition: color 0.2s, background-color 0.2s;
+            cursor: pointer;
+        }
+
+        .sidebar-link:hover {
+            background-color: var(--tertiary-bg);
+            color: var(--text-white);
+        }
+
+        .sidebar-link .sidebar-text {
+            margin-left: 1rem;
+            white-space: nowrap;
+        }
+
+        .sidebar-active-link {
+            color: var(--text-white);
+            background-image: linear-gradient(to right, var(--accent-blue), var(--accent-cyan));
+            background-size: 200% auto;
+            transition: background-position 0.5s ease;
+            margin: 0.5rem 0 0 0;
+        }
+
+        .sidebar-active-link:hover {
+            background-position: right center;
+            background-color: transparent;
+        }
+
+        .sidebar-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+        }
+
+        .user-info {
+            margin-left: 0.75rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-white);
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .main-content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .main-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background-color: var(--secondary-bg);
+            border-bottom: 1px solid var(--border-color);
+            height: 4rem;
+        }
+
+        .search-bar {
+            position: relative;
+            width: 100%;
+            max-width: 28rem;
+        }
+
+        .search-bar svg {
+            position: absolute;
+            top: 50%;
+            left: 0.75rem;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .search-input {
+            width: 100%;
+            padding-left: 2.5rem;
+            padding-right: 1rem;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-radius: 9999px;
+            background-color: var(--tertiary-bg);
+            color: var(--text-primary);
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--accent-blue);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-actions button {
+            position: relative;
+            padding: 0.5rem;
+            border-radius: 9999px;
+            color: var(--text-secondary);
+        }
+
+        .header-actions button:hover {
+            background-color: var(--tertiary-bg);
+            color: var(--text-white);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            height: 0.625rem;
+            width: 0.625rem;
+            background-color: #ef4444;
+            border-radius: 9999px;
+            border: 2px solid var(--secondary-bg);
+        }
+
+        #theme-toggle .dark-icon {
+            display: none;
+        }
+
+        .dark #theme-toggle .dark-icon {
+            display: block;
+        }
+
+        .dark #theme-toggle .light-icon {
+            display: none;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-white);
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .stat-card {
+            background-color: var(--secondary-bg);
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-0.5rem);
+        }
+
+        .stat-card-content {
+            display: flex;
+            align-items: center;
+        }
+
+        .stat-card-icon {
+            padding: 0.75rem;
+            border-radius: 9999px;
+            margin-right: 1rem;
+        }
+
+        .stat-card-info .label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-card-info .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-white);
+        }
+
+        .icon-bg-blue {
+            background-color: #1e3a8a;
+        }
+
+        .icon-text-blue {
+            color: #60a5fa;
+        }
+
+        .icon-bg-green {
+            background-color: #14532d;
+        }
+
+        .icon-text-green {
+            color: #4ade80;
+        }
+        
+        .icon-bg-purple {
+            background-color: #581c87;
+        }
+        .icon-text-purple {
+             color: #c084fc;
+        }
+
+        .icon-bg-yellow {
+            background-color: #713f12;
+        }
+
+        .icon-text-yellow {
+            color: #facc15;
+        }
+
+        .icon-bg-red {
+            background-color: #7f1d1d;
+        }
+
+        .icon-text-red {
+            color: #f87171;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .chart-card-large {
+                grid-column: span 2 / span 2;
+            }
+        }
+
+        .chart-card {
+            background-color: var(--secondary-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-white);
+            margin-bottom: 1rem;
+        }
+
+        .chart-container {
+            height: 20rem;
+        }
+
+        .page-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            font-weight: 700;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: #2563eb;
+            color: var(--text-white);
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background-color: #4b5563;
+            color: var(--text-white);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--tertiary-bg);
+        }
+
+        .table-container {
+            background-color: var(--secondary-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            text-align: left;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            white-space: nowrap;
+        }
+
+        .data-table thead tr {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table tbody tr {
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s;
+        }
+
+        .data-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: rgba(55, 65, 81, 0.5);
+        }
+
+        .data-table .doc-name-cell {
+            color: var(--text-white);
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .data-table .doc-name-cell:hover {
+            color: var(--accent-blue);
+        }
+
+        .data-table .actions-cell button {
+            color: var(--text-secondary);
+            margin: 0 0.25rem;
+        }
+
+        .data-table .actions-cell button:hover {
+            color: var(--accent-blue);
+        }
+
+        .placeholder-card {
+            background-color: var(--secondary-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .modal-content {
+            background-color: var(--secondary-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 32rem;
+            transform: scale(0.95);
+            transition: transform 0.3s;
+        }
+        
+        #details-modal .modal-content {
+             max-width: 56rem;
+        }
+
+        .modal:not(.hidden) .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-white);
+            margin-bottom: 1.5rem;
+        }
+
+        #dropzone {
+            border: 2px dashed #4b5563;
+            border-radius: 0.5rem;
+            padding: 2.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        #dropzone:hover,
+        .dropzone-active {
+            border-color: var(--accent-blue);
+        }
+
+        .modal-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            background-color: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            color: var(--text-primary);
+        }
+        
+        .workflow-stage {
+            flex: 1; text-align: center; position: relative;
+        }
+        .workflow-stage:not(:last-child)::after {
+            content: ''; position: absolute; top: 25%; right: -50%; transform: translateX(-50%);
+            width: 100%; height: 2px; background-color: #4b5563; z-index: 0;
+        }
+        .workflow-icon {
+            width: 3rem; height: 3rem; border-radius: 9999px; display: inline-flex;
+            align-items: center; justify-content: center; position: relative; z-index: 10;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Kochi_Metro_logo.svg/1200px-Kochi_Metro_logo.svg.png" alt="KMRL Logo" class="logo">
+                    <span id="sidebar-title">KMRL DIS</span>
+                </div>
+                <button id="sidebar-toggle"><i data-feather="chevrons-left"></i></button>
+            </div>
+            <nav id="sidebar-nav">
+                <a class="sidebar-link sidebar-active-link" data-target="dashboard"><i data-feather="bar-chart-2"></i><span class="sidebar-text">Dashboard</span></a>
+                <a class="sidebar-link" data-target="documents"><i data-feather="file-text"></i><span class="sidebar-text">Documents</span></a>
+                <a class="sidebar-link" data-target="idp"><i data-feather="cpu"></i><span class="sidebar-text">IDP Insights</span></a>
+                <a class="sidebar-link" data-target="workflows"><i data-feather="git-merge"></i><span class="sidebar-text">Workflows</span></a>
+                <a class="sidebar-link" data-target="reports"><i data-feather="file-plus"></i><span class="sidebar-text">Reports</span></a>
+                <a class="sidebar-link" data-target="audittrail"><i data-feather="activity"></i><span class="sidebar-text">Audit Trail</span></a>
+                <a class="sidebar-link" data-target="settings"><i data-feather="settings"></i><span class="sidebar-text">Settings</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="https://placehold.co/40x40/a78bfa/4c1d95?text=UU" alt="User Avatar" class="user-avatar">
+                    <div class="user-info sidebar-text">
+                        <p class="user-name">{{ user_name }}</p>
+                        <p class="user-role">{{ user_role.title() }}</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="main-content-wrapper">
+            <header class="main-header">
+                <div class="search-bar">
+                    <i data-feather="search" style="width:1.25rem; height:1.25rem;"></i>
+                    <input type="text" placeholder="Full-text search for content, filename, tags..." class="search-input">
+                </div>
+                <div class="header-actions">
+                    <button><i data-feather="bell"></i><span class="notification-badge"></span></button>
+                    <button id="theme-toggle"><i data-feather="moon" class="light-icon"></i><i data-feather="sun" class="dark-icon"></i></button>
+                    <a href="{{ url_for('logout') }}" class="btn btn-secondary">
+                        <i data-feather="log-out"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </header>
+
+            <main class="content-area">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="bg-{% if category == 'error' %}red{% else %}green{% endif %}-500/20 border border-{% if category == 'error' %}red{% else %}green{% endif %}-500/50 text-{% if category == 'error' %}red{% else %}green{% endif %}-200 px-4 py-3 rounded-lg mb-4 mx-4">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <div id="dashboard" class="page-content">
+                    <h1 class="page-title">Analytics Dashboard</h1>
+                    <div class="stats-grid">
+                        <div class="stat-card fade-in-up" style="animation-delay: 0.1s;"><div class="stat-card-content"><div class="stat-card-icon icon-bg-blue"><i data-feather="file-text" class="icon-text-blue"></i></div><div class="stat-card-info"><p class="label">Total Documents</p><p id="stat-total-docs" class="value">{{ stats.total_documents if stats else 0 }}</p></div></div></div>
+                        <div class="stat-card fade-in-up" style="animation-delay: 0.2s;"><div class="stat-card-content"><div class="stat-card-icon icon-bg-green"><i data-feather="upload-cloud" class="icon-text-green"></i></div><div class="stat-card-info"><p class="label">Uploaded Today</p><p id="stat-uploaded-today" class="value">{{ stats.uploaded_today if stats else 0 }}</p></div></div></div>
+                        <div class="stat-card fade-in-up" style="animation-delay: 0.3s;"><div class="stat-card-content"><div class="stat-card-icon icon-bg-yellow"><i data-feather="alert-circle" class="icon-text-yellow"></i></div><div class="stat-card-info"><p class="label">Pending Approval</p><p id="stat-pending-approval" class="value">{{ stats.pending_approval if stats else 0 }}</p></div></div></div>
+                        <div class="stat-card fade-in-up" style="animation-delay: 0.4s;"><div class="stat-card-content"><div class="stat-card-icon icon-bg-red"><i data-feather="archive" class="icon-text-red"></i></div><div class="stat-card-info"><p class="label">Archived</p><p id="stat-archived-count" class="value">{{ stats.archived_count if stats else 0 }}</p></div></div></div>
+                    </div>
+                    <div class="charts-grid">
+                        <div class="chart-card chart-card-large fade-in-up" style="animation-delay: 0.5s;"><h3 class="chart-title">Monthly Document Activity</h3><div class="chart-container"><canvas id="activityChart"></canvas></div></div>
+                        <div class="chart-card fade-in-up" style="animation-delay: 0.6s;"><h3 class="chart-title">Document Status</h3><div class="chart-container"><canvas id="statusChart"></canvas></div></div>
+                        <div class="chart-card chart-card-large fade-in-up" style="animation-delay: 0.7s;"><h3 class="chart-title">User Productivity (Last 30 Days)</h3><div class="chart-container"><canvas id="productivityChart"></canvas></div></div>
+                        <div class="chart-card fade-in-up" style="animation-delay: 0.8s;"><h3 class="chart-title">Recent Activity</h3><div id="recent-activity-feed" class="space-y-4 text-sm overflow-y-auto h-80"></div></div>
+                    </div>
+                </div>
+
+                <div id="documents" class="page-content hidden">
+                    <div class="page-actions">
+                        <h1 class="page-title" style="margin-bottom: 0;">Centralized Repository</h1>
+                        <button id="upload-btn" class="btn btn-primary"><i data-feather="upload" class="mr-2"></i> Upload Document</button>
+                    </div>
+                    <div class="filters">
+                        <select id="status-filter" class="filter-select"><option value="all">All Statuses</option><option value="Approved">Approved</option><option value="Pending">Pending</option><option value="In Review">In Review</option><option value="Archived">Archived</option></select>
+                        <select id="type-filter" class="filter-select"><option value="all">All Types</option><option value="PDF">PDF</option><option value="DOCX">DOCX</option><option value="XLSX">XLSX</option><option value="ZIP">ZIP</option></select>
+                        <input type="date" id="date-filter" class="filter-select">
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead><tr><th>File Name</th><th>Type</th><th>Status</th><th>Tags</th><th>Last Modified</th><th>Actions</th></tr></thead>
+                            <tbody id="documents-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div id="idp" class="page-content hidden">
+                    <h1 class="page-title">Intelligent Document Processing Insights</h1>
+                    <div class="stats-grid">
+                        <div class="stat-card fade-in-up" style="animation-delay: 0.1s;"><div class="stat-card-content"><div class="stat-card-icon icon-bg-blue"><i data-feather="cpu" class="icon-text-blue"></i></div><div class="stat-card-info"><p class="label">Documents Processed by AI</p><p class="value">12,548</p></div></div></div>
+                        <div class="stat-card fade-in-up" style="animation-delay: 0.2s;"><div class="stat-card-content"><div class="stat-card-icon icon-bg-green"><i data-feather="target" class="icon-text-green"></i></div><div class="stat-card-info"><p class="label">Average Accuracy Rate</p><p class="value">98.7%</p></div></div></div>
+                        <div class="stat-card fade-in-up" style="animation-delay: 0.3s;"><div class="stat-card-content"><div class="stat-card-icon icon-bg-yellow"><i data-feather="clock" class="icon-text-yellow"></i></div><div class="stat-card-info"><p class="label">Manual Entry Time Saved</p><p class="value">~452 hrs</p></div></div></div>
+                        <div class="stat-card fade-in-up" style="animation-delay: 0.4s;"><div class="stat-card-content"><div class="stat-card-icon icon-bg-purple"><i data-feather="check-circle" class="icon-text-purple"></i></div><div class="stat-card-info"><p class="label">Fields Auto-Validated</p><p class="value">87,123</p></div></div></div>
+                    </div>
+                    <div class="charts-grid">
+                         <div class="chart-card fade-in-up" style="animation-delay: 0.5s;"><h3 class="chart-title">AI Document Classification</h3><div class="chart-container"><canvas id="idpDocTypeChart"></canvas></div></div>
+                         <div class="chart-card chart-card-large fade-in-up" style="animation-delay: 0.6s;">
+                            <h3 class="chart-title">Recent IDP Log</h3>
+                            <div class="table-container p-0">
+                                <table class="data-table">
+                                    <thead><tr><th>Document</th><th>Action</th><th>Status</th></tr></thead>
+                                    <tbody id="idp-log-body"></tbody>
+                                </table>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+
+                <div id="workflows" class="page-content hidden">
+                    <div class="page-actions">
+                        <h1 class="page-title" style="margin-bottom: 0;">Workflow Automation</h1>
+                        <button class="btn btn-primary"><i data-feather="plus" class="mr-2"></i> Create Workflow</button>
+                    </div>
+                    <div class="bg-gray-800 rounded-2xl shadow-lg p-6 mb-6">
+                        <h2 class="text-xl font-semibold text-white mb-4">Invoice Approval Workflow</h2>
+                        <div class="flex items-start justify-between">
+                             <div class="workflow-stage"><div class="workflow-icon bg-green-500"><i data-feather="check"></i></div><p class="mt-2 text-sm">Submitted</p></div>
+                             <div class="workflow-stage"><div class="workflow-icon bg-blue-500"><i data-feather="user-check"></i></div><p class="mt-2 text-sm">Manager Review</p></div>
+                             <div class="workflow-stage"><div class="workflow-icon bg-gray-600"><i data-feather="dollar-sign"></i></div><p class="mt-2 text-sm">Finance Approval</p></div>
+                             <div class="workflow-stage"><div class="workflow-icon bg-gray-600"><i data-feather="archive"></i></div><p class="mt-2 text-sm">Paid & Archived</p></div>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-4">Active Instances</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                             <thead><tr><th>Document</th><th>Workflow</th><th>Current Stage</th><th>Assigned To</th><th>Initiated</th></tr></thead>
+                             <tbody>
+                                 <tr><td>INV-2025-09-A.pdf</td><td>Invoice Approval</td><td>Manager Review</td><td>Anjali Menon</td><td>2025-09-08</td></tr>
+                                 <tr><td>Contract-Renewal-B.docx</td><td>Contract Review</td><td>Legal Dept.</td><td>Vijay Kumar</td><td>2025-09-07</td></tr>
+                             </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="reports" class="page-content hidden">
+                    <div class="page-actions">
+                        <h1 class="page-title" style="margin-bottom: 0;">Reporting & Analytics</h1>
+                        <button class="btn btn-primary"><i data-feather="plus" class="mr-2"></i> Generate Custom Report</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead><tr><th>Report Name</th><th>Description</th><th>Generated On</th><th>Actions</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-semibold text-white">Document Usage Report</td>
+                                    <td>Tracks views, downloads, and modifications per department.</td>
+                                    <td>2025-09-01</td>
+                                    <td class="actions-cell">
+                                        <button><i data-feather="eye" class="w-5 h-5"></i></button>
+                                        <button><i data-feather="download" class="w-5 h-5"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold text-white">Workflow Efficiency</td>
+                                    <td>Analyzes time spent in each stage of the approval process.</td>
+                                    <td>2025-09-05</td>
+                                    <td class="actions-cell">
+                                        <button><i data-feather="eye" class="w-5 h-5"></i></button>
+                                        <button><i data-feather="download" class="w-5 h-5"></i></button>
+                                    </td>
+                                </tr>
+                                 <tr>
+                                    <td class="font-semibold text-white">User Activity Log</td>
+                                    <td>A detailed log of all actions performed by a specific user.</td>
+                                    <td>2025-09-08</td>
+                                    <td class="actions-cell">
+                                        <button><i data-feather="eye" class="w-5 h-5"></i></button>
+                                        <button><i data-feather="download" class="w-5 h-5"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="audittrail" class="page-content hidden">
+                     <h1 class="page-title">Audit Trail</h1>
+                     <div class="table-container">
+                         <table class="data-table">
+                             <thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Document/Target</th><th>Details</th></tr></thead>
+                             <tbody id="audit-table-body"></tbody>
+                         </table>
+                     </div>
+                </div>
+
+                <div id="settings" class="page-content hidden">
+                    <h1 class="page-title">Settings</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 space-y-6">
+                             <!-- Access Control -->
+                            <div class="bg-gray-800 rounded-2xl shadow-lg p-6">
+                                <h2 class="text-xl font-semibold text-white border-b border-gray-700 pb-4 mb-4">Access Control (RBAC)</h2>
+                                <p class="text-gray-400 mb-4">Manage user roles and permissions.</p>
+                                <div class="table-container p-0">
+                                    <table class="data-table">
+                                        <thead><tr><th>Role</th><th>Permissions</th><th>Users</th></tr></thead>
+                                        <tbody>
+                                            <tr><td>Admin</td><td class="text-sm">Full Access, User Mgmt, Settings</td><td class="text-white font-semibold">2</td></tr>
+                                            <tr><td>Manager</td><td class="text-sm">Approve/Reject Docs, Manage Team</td><td class="text-white font-semibold">5</td></tr>
+                                            <tr><td>Contributor</td><td class="text-sm">Upload, Edit Own Docs</td><td class="text-white font-semibold">25</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- Integrations -->
+                            <div class="bg-gray-800 rounded-2xl shadow-lg p-6">
+                                <h2 class="text-xl font-semibold text-white border-b border-gray-700 pb-4 mb-4">Integration Capabilities</h2>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <div class="placeholder-card p-4"><i data-feather="database" class="w-10 h-10 mx-auto text-blue-400 mb-2"></i><p class="text-sm">ERP System</p></div>
+                                    <div class="placeholder-card p-4"><i data-feather="users" class="w-10 h-10 mx-auto text-green-400 mb-2"></i><p class="text-sm">HRMS</p></div>
+                                    <div class="placeholder-card p-4"><i data-feather="briefcase" class="w-10 h-10 mx-auto text-yellow-400 mb-2"></i><p class="text-sm">Project Mgmt</p></div>
+                                    <div class="placeholder-card p-4"><i data-feather="at-sign" class="w-10 h-10 mx-auto text-red-400 mb-2"></i><p class="text-sm">Email</p></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-800 rounded-2xl shadow-lg p-6">
+                             <h2 class="text-xl font-semibold text-white border-b border-gray-700 pb-4 mb-4">Security</h2>
+                             <div class="space-y-4">
+                                <div><h3 class="font-semibold text-white">Encryption</h3><p class="text-sm text-gray-400">Data is encrypted at-rest and in-transit using AES-256.</p></div>
+                                <div><h3 class="font-semibold text-white">Two-Factor Auth (2FA)</h3><p class="text-sm text-gray-400">All users are required to enable 2FA for account security.</p></div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="upload-modal" class="modal hidden"><div class="modal-content"><h2 class="modal-title">Upload New Document</h2><div id="dropzone"><i data-feather="upload-cloud" class="w-16 h-16 mx-auto text-gray-500"></i><p class="mt-4 text-white">Drag & drop files here or <span class="text-blue-400 font-semibold">browse</span></p><input type="file" id="file-input" class="hidden" multiple></div><div id="upload-progress-container" class="mt-4"></div><div id="ai-tags-container" class="mt-4 hidden"><h4 class="font-semibold text-white">AI Suggested Tags:</h4><div class="flex flex-wrap gap-2 mt-2"><span class="bg-blue-600 text-xs font-semibold px-2 py-1 rounded">finance</span> <span class="bg-blue-600 text-xs font-semibold px-2 py-1 rounded">report</span> <span class="bg-blue-600 text-xs font-semibold px-2 py-1 rounded">q3</span></div></div><div class="modal-actions"><button id="close-upload-modal-btn" class="btn btn-secondary">Close</button></div></div></div>
+    <div id="edit-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="modal-title">Edit Document</h2>
+            <form id="edit-form" method="POST">
+                <input type="text" id="edit-filename" class="w-full bg-gray-700 p-2 rounded mb-2 text-white" readonly>
+                <textarea id="edit-description" name="description" rows="3" class="w-full bg-gray-700 p-2 rounded text-white" placeholder="Description..."></textarea>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="toggleModal('edit-modal', false)">Cancel</button>
+                    <button type="submit" class="btn btn-primary ml-2">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="details-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="details-title" class="modal-title">Document Details</h2>
+            <div id="details-content" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="md:col-span-2">
+                    <h3 class="font-semibold text-white mb-2">Document Preview</h3>
+                    <div id="details-preview" class="bg-gray-900 rounded-lg h-96 flex items-center justify-center text-gray-500">Preview Unavailable</div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                         <h3 class="font-semibold text-white mb-2 flex items-center justify-between">
+                             <span>Extracted Data (IDP)</span>
+                             <span id="ocr-badge" class="hidden text-xs bg-green-600 text-white font-semibold px-2 py-0.5 rounded-full">OCR Processed</span>
+                         </h3>
+                        <div id="details-metadata" class="text-sm text-gray-400 bg-gray-900 p-3 rounded-lg"></div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-white mb-2">Version Control</h3>
+                        <div id="details-history" class="text-sm text-gray-400 bg-gray-900 p-3 rounded-lg max-h-40 overflow-y-auto"></div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-white mb-2">Collaboration</h3>
+                        <div id="details-comments" class="space-y-3 text-sm text-gray-400 bg-gray-900 p-3 rounded-lg max-h-40 overflow-y-auto"></div>
+                        <div class="mt-2 flex">
+                            <input type="text" placeholder="Add a comment..." class="search-input text-sm flex-grow mr-2">
+                            <button class="btn btn-primary btn-sm py-1 px-3">Post</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions"><button id="close-details-modal-btn" class="btn btn-secondary">Close</button></div>
+        </div>
+    </div>
+<style>
+        :root {
+            --primary-bg: #111827; --secondary-bg: #1f2937; --tertiary-bg: #374151;
+            --border-color: #374151; --text-primary: #d1d5db; --text-secondary: #9ca3af;
+            --text-white: #ffffff; --accent-blue: #3b82f6; --accent-cyan: #06b6d4;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--primary-bg); color: var(--text-primary); }
+        .container { max-width: 1200px; margin: 2rem auto; padding: 2rem; background-color: var(--secondary-bg); border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
+        .header h1 { font-size: 1.875rem; font-weight: 700; color: var(--text-white); }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 600; padding: 0.5rem 1rem; border-radius: 0.5rem; transition: all 0.2s; cursor: pointer; text-decoration: none; border: none; }
+        .btn-secondary { background-color: #4b5563; color: #ffffff; }
+        .btn-secondary:hover { background-color: #374151; }
+        .table-container { overflow-x: auto; }
+        .data-table { width: 100%; text-align: left; border-collapse: collapse; }
+        .data-table th, .data-table td { padding: 1rem; white-space: nowrap; border-bottom: 1px solid var(--border-color); }
+        .data-table thead { background-color: rgba(55, 65, 81, 0.5); }
+        .data-table tbody tr:hover { background-color: rgba(55, 65, 81, 0.3); }
+        .actions-cell { display: flex; gap: 0.5rem; }
+        .btn-success { background-color: #16a34a; color: white; }
+        .btn-success:hover { background-color: #15803d; }
+        .btn-danger { background-color: #dc2626; color: white; }
+        .btn-danger:hover { background-color: #b91c1c; }
+        .flash-message { padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem; font-weight: 500; }
+        .flash-success { background-color: #10b981; color: #ffffff; }
+        .flash-error { background-color: #ef4444; color: #ffffff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Pending Document Approvals</h1>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                <i data-feather="arrow-left"></i>
+                <span>Back to Dashboard</span>
+            </a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Filename</th>
+                        <th>Uploader</th>
+                        <th>Upload Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if documents %}
+        {% for doc in documents %}
+        <tr>
+            <td class="font-semibold text-white">{{ doc.filename }}</td>
+            <td>{{ doc.full_name }}</td>
+            <td>{{ doc.upload_date.strftime('%Y-%m-%d %H:%M') if doc.upload_date else 'N/A' }}</td>
+            <td class="actions-cell">
+                <a href="{{ url_for('approve_document', doc_id=doc.id) }}" class="btn btn-success">
+                    <i data-feather="check" class="w-4 h-4"></i>
+                    <span>Approve</span>
+                </a>
+                <a href="{{ url_for('reject_document', doc_id=doc.id) }}" class="btn btn-danger">
+                    <i data-feather="x" class="w-4 h-4"></i>
+                    <span>Reject</span>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td colspan="4" class="text-center py-8 text-gray-400">No documents are currently pending approval.</td>
+        </tr>
+    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        feather.replace();
+    </script>
+
+    <script id="server-data" type="application/json">
+        {{ {
+            'stats': stats if stats is defined else None,
+            'documents': documents if documents is defined else None,
+            'recent_activity': recent_activity if recent_activity is defined else None,
+            'idp_log': idp_log if idp_log is defined else None,
+            'workflows': workflows if workflows is defined else None,
+            'reports': reports if reports is defined else None
+        } | tojson }}
+    </script>
+    
+    <script>
+        // Injected server data if available
+        const serverDataEl = document.getElementById('server-data');
+        window.serverData = window.serverData || {};
+        if (serverDataEl && serverDataEl.textContent) {
+            try { window.serverData = JSON.parse(serverDataEl.textContent); } catch (e) { console.error('Failed parsing server data', e); }
+        }
+
+        feather.replace();
+
+        // Update stats from server if present
+        function updateStatsFromServer() {
+            if (window.serverData && window.serverData.stats) {
+                const s = window.serverData.stats;
+                const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = String(val); };
+                setText('stat-total-docs', s.total_documents ?? '0');
+                setText('stat-uploaded-today', s.uploaded_today ?? '0');
+                setText('stat-pending-approval', s.pending_approval ?? '0');
+                setText('stat-archived-count', s.archived_count ?? '0');
+            }
+        }
+
+        // Fetch dashboard data from API
+        async function fetchDashboardData() {
+            try {
+                const response = await fetch('/api/dashboard');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+                return null;
+            }
+        }
+
+        let mockDocuments = [
+            { id: 1, name: 'Q3-Financial-Report.pdf', type: 'PDF', status: 'Approved', modified: '2025-09-05', access: 'restricted', version: 3, tags: ['finance', 'quarterly', 'report'], history: [{ v: 3, date: '2025-09-05', user: 'Admin' }, { v: 2, date: '2025-09-04', user: 'Standard User' }], metadata: { 'Invoice #': 'N/A', 'Amount': '₹4,500,000', 'Vendor': 'ACME Corp' }, comments: [{user: 'Admin', text: 'Please verify the amount with finance.', time: '2 days ago'}] },
+            { id: 2, name: 'New-Metro-Line-Proposal.docx', type: 'DOCX', status: 'Pending', modified: '2025-09-04', access: 'public', version: 1, tags: ['proposal', 'project', 'new'], history: [{ v: 1, date: '2025-09-04', user: 'Standard User' }], metadata: { 'Project Lead': 'Ravi Sharma', 'Est. Budget': '₹25,000,000', 'Timeline': '24 Months' }, comments: [] },
+            { id: 3, name: 'Safety-Audit-Report.pdf', type: 'PDF', status: 'Approved', modified: '2025-09-02', access: 'public', version: 2, tags: ['safety', 'audit'], history: [{ v: 2, date: '2025-09-02', user: 'Admin' }], metadata: { 'Audit Date': '2025-08-30', 'Result': 'Pass', 'Auditor': 'Third-Party Inc.' }, comments: [{user: 'Anjali Menon', text: 'All safety checks passed successfully.', time: '4 days ago'}] },
+            { id: 4, name: 'Mkt-Campaign-Analytics.xlsx', type: 'XLSX', status: 'In Review', modified: '2025-08-28', access: 'public', version: 5, tags: ['marketing', 'analytics'], history: [{ v: 5, date: '2025-08-28', user: 'Standard User' }], metadata: { 'Campaign': 'Diwali Bonanza', 'ROI': '250%', 'Leads': '15,400' }, comments: [] },
+            { id: 5, name: 'Old-Tender-Documents.zip', type: 'ZIP', status: 'Archived', modified: '2025-08-15', access: 'restricted', version: 1, tags: ['tender', 'archive'], history: [{ v: 1, date: '2025-08-15', user: 'Admin' }], metadata: { 'Tender ID': 'KMRL-T-2024-015' }, comments: [] },
+        ];
+
+        // Override mocks with server data when present
+        if (window.serverData && Array.isArray(window.serverData.documents) && window.serverData.documents.length > 0) {
+            mockDocuments = window.serverData.documents.map(d => ({
+                id: d.id,
+                name: d.name,
+                type: d.type || '',
+                status: d.status || 'Pending',
+                tags: Array.isArray(d.tags) ? d.tags : [],
+                modified: d.modified || '',
+                access: 'public',
+                version: 1,
+                history: [],
+                metadata: {},
+                comments: [],
+            }));
+        }
+
+        const recentActivity = [
+            { user: 'Anjali Menon', action: 'approved', document: 'Q3-Financial-Report.pdf', time: '1h ago' },
+            { user: 'You', action: 'uploaded', document: 'New-Metro-Line-Proposal.docx', time: '3h ago' },
+            { user: 'Admin', action: 'commented on', document: 'Safety-Audit-Report.pdf', time: 'Yesterday' },
+            { user: 'Vijay Kumar', action: 'rejected', document: 'Vendor-Contract-Ext.docx', time: 'Yesterday' },
+            { user: 'Anjali Menon', action: 'started workflow for', document: 'INV-2025-09-A.pdf', time: '2 days ago' },
+        ];
+        if (window.serverData && Array.isArray(window.serverData.recent_activity) && window.serverData.recent_activity.length > 0) {
+            // Map server activity to display format
+            const mapped = window.serverData.recent_activity.map(a => ({
+                user: String(a.user),
+                action: a.action.toLowerCase(),
+                document: a.target || '',
+                time: a.ts,
+            }));
+            // Replace feed source used in renderCharts()
+            while (recentActivity.length) recentActivity.pop();
+            mapped.forEach(x => recentActivity.push(x));
+        }
+        
+        const auditTrail = [
+            { ts: '2025-09-08 10:15:22', user: 'Anjali Menon', action: 'Approve', target: 'Q3-Financial-Report.pdf', details: 'Final version approved.'},
+            { ts: '2025-09-08 08:05:10', user: 'Standard User', action: 'Upload', target: 'New-Metro-Line-Proposal.docx', details: 'v1 uploaded for review.'},
+            { ts: '2025-09-07 16:30:00', user: 'Admin', action: 'Update Role', target: 'Vijay Kumar', details: 'Role changed to Manager.'},
+            { ts: '2025-09-07 14:12:45', user: 'Standard User', action: 'View', target: 'Safety-Audit-Report.pdf', details: 'Accessed document.'},
+            { ts: '2025-09-06 11:00:00', user: 'System', action: 'Auto-Archive', target: 'Old-Tender-Documents.zip', details: 'Document archived based on policy.'},
+        ];
+        if (window.serverData && Array.isArray(window.serverData.recent_activity) && window.serverData.recent_activity.length > 0) {
+            // Use server audit data for the audit table too
+            while (auditTrail.length) auditTrail.pop();
+            window.serverData.recent_activity.forEach(a => auditTrail.push({
+                ts: a.ts,
+                user: String(a.user),
+                action: a.action,
+                target: a.target || '',
+                details: a.details || '',
+            }));
+        }
+        
+        const idpLog = [
+            { doc: 'INV-2025-09-C.pdf', action: 'Data Extracted', status: 'Success' },
+            { doc: 'scanned_receipt.jpg', action: 'OCR & Classification', status: 'Success' },
+            { doc: 'Vendor-Agreement-v3.pdf', action: 'Data Extraction', status: 'Needs Review' },
+            { doc: 'unclear_scan.png', action: 'OCR', status: 'Failed' },
+        ];
+        if (window.serverData && Array.isArray(window.serverData.idp_log) && window.serverData.idp_log.length > 0) {
+            while (idpLog.length) idpLog.pop();
+            window.serverData.idp_log.forEach(l => idpLog.push(l));
+        }
+
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebarTitle = document.getElementById('sidebar-title');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        const themeToggle = document.getElementById('theme-toggle');
+        const sidebarNav = document.getElementById('sidebar-nav');
+        const pageContents = document.querySelectorAll('.page-content');
+        const documentsTableBody = document.getElementById('documents-table-body');
+        const auditTableBody = document.getElementById('audit-table-body');
+        const idpLogBody = document.getElementById('idp-log-body');
+
+        const uploadModal = document.getElementById('upload-modal');
+        const uploadBtn = document.getElementById('upload-btn');
+        const closeUploadModalBtn = document.getElementById('close-upload-modal-btn');
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        const aiTagsContainer = document.getElementById('ai-tags-container');
+
+        const detailsModal = document.getElementById('details-modal');
+        const closeDetailsModalBtn = document.getElementById('close-details-modal-btn');
+
+        function navigate(targetId) {
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('sidebar-active-link'));
+            document.querySelector(`.sidebar-link[data-target='${targetId}']`).classList.add('sidebar-active-link');
+            pageContents.forEach(page => page.classList.add('hidden'));
+            document.getElementById(targetId).classList.remove('hidden');
+            feather.replace(); // Re-initialize icons on page change
+        }
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            sidebarTitle.classList.toggle('hidden');
+            sidebarToggle.classList.toggle('rotated');
+            sidebarTexts.forEach(text => text.classList.toggle('hidden'));
+        });
+
+        themeToggle.addEventListener('click', () => { document.documentElement.classList.toggle('dark'); });
+
+        sidebarNav.addEventListener('click', (e) => {
+            const link = e.target.closest('.sidebar-link');
+            if (link) { e.preventDefault(); navigate(link.dataset.target); }
+        });
+
+        function getStatusBadge(status) {
+            const colors = { 
+                'Approved': 'green', 'Pending': 'yellow', 'In Review': 'blue', 'Archived': 'gray', 'Rejected': 'red', 
+                'Approve': 'green', 'Upload': 'blue', 'Update Role': 'purple', 'View': 'yellow', 'Auto-Archive': 'gray',
+                'Success': 'green', 'Needs Review': 'yellow', 'Failed': 'red'
+            };
+            const color = colors[status] || 'gray';
+            const bgColor = `bg-${color}-500`;
+            const textColor = `text-white`;
+            return `<span class="${bgColor} ${textColor} text-xs font-semibold px-2.5 py-0.5 rounded-full">${status}</span>`;
+        }
+
+       function populateDocumentsTable(documents) { // Takes documents as an argument
+    const documentsTableBody = document.getElementById('documents-table-body');
+    documentsTableBody.innerHTML = ''; // Clear the existing table body
+
+    if (!documents || documents.length === 0) {
+        // Optional: Show a message when there are no documents
+        const row = documentsTableBody.insertRow();
+        const cell = row.insertCell();
+        cell.colSpan = 6; // Span across all columns
+        cell.textContent = 'No documents found.';
+        cell.style.textAlign = 'center';
+        cell.style.padding = '1rem';
+        return;
+    }
+
+    documents.forEach(doc => {
+        const row = document.createElement('tr');
+
+        // 1. File Name Cell (Safer: using textContent for the name)
+        const nameCell = document.createElement('td');
+        nameCell.className = 'doc-name-cell';
+        nameCell.dataset.docId = doc.id; // Set data attribute for clicks
+        if (doc.access === 'restricted') {
+            const lockIcon = document.createElement('i');
+            lockIcon.dataset.feather = 'lock';
+            lockIcon.className = 'w-4 h-4 mr-2';
+            nameCell.appendChild(lockIcon);
+        }
+        nameCell.appendChild(document.createTextNode(` ${doc.name}`)); // Safely add the filename
+        row.appendChild(nameCell);
+
+        // 2. Type Cell
+        const typeCell = document.createElement('td');
+        typeCell.textContent = doc.type;
+        row.appendChild(typeCell);
+
+        // 3. Status Cell (innerHTML is okay here as we control the source)
+        const statusCell = document.createElement('td');
+        statusCell.innerHTML = getStatusBadge(doc.status);
+        row.appendChild(statusCell);
+
+        // 4. Tags Cell (innerHTML is also fine here)
+        const tagsCell = document.createElement('td');
+        tagsCell.innerHTML = (doc.tags || []).map(tag => `<span class="bg-gray-700 text-xs font-semibold px-2 py-0.5 rounded">${tag}</span>`).join(' ');
+        row.appendChild(tagsCell);
+        
+        // 5. Modified Date Cell
+        const modifiedCell = document.createElement('td');
+        // Format the date for better readability
+        modifiedCell.textContent = new Date(doc.modified).toLocaleDateString();
+        row.appendChild(modifiedCell);
+
+        // 6. Actions Cell (with clickable buttons)
+        const actionsCell = document.createElement('td');
+        actionsCell.className = 'actions-cell';
+        
+        const editButton = document.createElement('button');
+        editButton.innerHTML = `<i data-feather="edit-2" class="w-5 h-5"></i>`;
+        editButton.onclick = () => editDocument(doc.id); // Placeholder for edit action
+        
+        const deleteButton = document.createElement('button');
+        deleteButton.innerHTML = `<i data-feather="trash-2" class="w-5 h-5"></i>`;
+        deleteButton.onclick = () => deleteDocument(doc.id); // Placeholder for delete action
+
+        actionsCell.appendChild(editButton);
+        actionsCell.appendChild(deleteButton);
+        row.appendChild(actionsCell);
+
+        documentsTableBody.appendChild(row);
+    });
+
+    feather.replace(); // Re-initialize icons
+}
+
+// --- Enhanced document management functions ---
+async function editDocument(docId) {
+    console.log(`Editing document with ID: ${docId}`);
+    
+    try {
+        // Fetch document details
+        const response = await fetch(`/api/document/${docId}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch document details');
+        }
+        
+        const doc = await response.json();
+        
+        // Populate edit form
+        document.getElementById('edit-filename').value = doc.filename || '';
+        document.getElementById('edit-description').value = doc.description || '';
+        
+        // Store document ID for form submission
+        document.getElementById('edit-form').dataset.docId = docId;
+        
+        // Show edit modal
+        toggleModal(document.getElementById('edit-modal'), true);
+        
+    } catch (error) {
+        console.error('Error fetching document details:', error);
+        alert('Failed to load document details. Please try again.');
+    }
+}
+
+async function deleteDocument(docId) {
+    console.log(`Deleting document with ID: ${docId}`);
+    
+    if (confirm(`Are you sure you want to delete document #${docId}? This action cannot be undone.`)) {
+        try {
+            const response = await fetch(`/api/delete_document/${docId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to delete document');
+            }
+            
+            const result = await response.json();
+            alert('Document deleted successfully!');
+            
+            // Refresh the documents table
+            await refreshDocumentsTable();
+            
+        } catch (error) {
+            console.error('Error deleting document:', error);
+            alert('Failed to delete document. Please try again.');
+        }
+    }
+}
+
+async function refreshDocumentsTable() {
+    try {
+        const response = await fetch('/api/dashboard');
+        if (response.ok) {
+            const data = await response.json();
+            if (Array.isArray(data.documents)) {
+                mockDocuments = data.documents.map(d => ({
+                    id: d.id, 
+                    name: d.name, 
+                    type: d.type || '', 
+                    status: d.status || 'Pending', 
+                    tags: Array.isArray(d.tags) ? d.tags : [], 
+                    modified: d.modified || '', 
+                    access: 'public', 
+                    version: 1, 
+                    history: [], 
+                    metadata: {}, 
+                    comments: []
+                }));
+                populateDocumentsTable(mockDocuments);
+            }
+        }
+    } catch (error) {
+        console.error('Error refreshing documents table:', error);
+    }
+}
+
+// Enhanced search functionality
+async function performSearch() {
+    const query = document.querySelector('.search-input').value;
+    const statusFilter = document.getElementById('status-filter').value;
+    const typeFilter = document.getElementById('type-filter').value;
+    const dateFilter = document.getElementById('date-filter').value;
+    
+    try {
+        const params = new URLSearchParams();
+        if (query) params.append('q', query);
+        if (statusFilter !== 'all') params.append('status', statusFilter);
+        if (typeFilter !== 'all') params.append('type', typeFilter);
+        if (dateFilter) params.append('date', dateFilter);
+        
+        const response = await fetch(`/api/search?${params.toString()}`);
+        if (response.ok) {
+            const data = await response.json();
+            populateDocumentsTable(data.documents);
+        }
+    } catch (error) {
+        console.error('Search error:', error);
+        alert('Search failed. Please try again.');
+    }
+}
+
+// Enhanced filter functionality
+function setupFilters() {
+    const statusFilter = document.getElementById('status-filter');
+    const typeFilter = document.getElementById('type-filter');
+    const dateFilter = document.getElementById('date-filter');
+    
+    if (statusFilter) {
+        statusFilter.addEventListener('change', performSearch);
+    }
+    if (typeFilter) {
+        typeFilter.addEventListener('change', performSearch);
+    }
+    if (dateFilter) {
+        dateFilter.addEventListener('change', performSearch);
+    }
+}
+
+// Enhanced edit form submission
+function setupEditForm() {
+    const editForm = document.getElementById('edit-form');
+    if (editForm) {
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const docId = editForm.dataset.docId;
+            const description = document.getElementById('edit-description').value;
+            
+            try {
+                const response = await fetch(`/api/update_document/${docId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        description: description
+                    })
+                });
+                
+                if (response.ok) {
+                    alert('Document updated successfully!');
+                    toggleModal(document.getElementById('edit-modal'), false);
+                    await refreshDocumentsTable();
+                } else {
+                    throw new Error('Failed to update document');
+                }
+            } catch (error) {
+                console.error('Error updating document:', error);
+                alert('Failed to update document. Please try again.');
+            }
+        });
+    }
+}
+        
+        function populateAuditTrail() {
+            auditTableBody.innerHTML = '';
+            auditTrail.forEach(log => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${log.ts}</td>
+                    <td class="font-semibold text-white">${log.user}</td>
+                    <td>${getStatusBadge(log.action)}</td>
+                    <td class="text-blue-400">${log.target}</td>
+                    <td>${log.details}</td>
+                `;
+                 auditTableBody.appendChild(row);
+            });
+        }
+        
+        function populateIdpLog() {
+            idpLogBody.innerHTML = '';
+            idpLog.forEach(log => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="font-semibold text-white">${log.doc}</td>
+                    <td>${log.action}</td>
+                    <td>${getStatusBadge(log.status)}</td>
+                `;
+                idpLogBody.appendChild(row);
+            });
+        }
+
+        function toggleModal(modal, show) {
+            if (show) { modal.classList.remove('hidden'); setTimeout(() => modal.classList.add('fade-in'), 10); }
+            else { modal.classList.remove('fade-in'); setTimeout(() => modal.classList.add('hidden'), 300); }
+        }
+
+        uploadBtn.addEventListener('click', () => toggleModal(uploadModal, true));
+        closeUploadModalBtn.addEventListener('click', () => toggleModal(uploadModal, false));
+        dropzone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', async () => {
+            if (fileInput.files.length > 0) {
+                 aiTagsContainer.classList.remove('hidden');
+                 // Upload first file via POST /upload
+                 const file = fileInput.files[0];
+                 const form = new FormData();
+                 form.append('document', file);
+                 try {
+                    const res = await fetch('/upload', { 
+                        method: 'POST', 
+                        body: form,
+                        credentials: 'same-origin' // Include session cookies
+                    });
+                    if (res.redirected) {
+                        window.location.href = res.url;
+                    } else if (res.ok) {
+                        // Show success message
+                        const response = await res.text();
+                        if (response.includes('successfully')) {
+                            alert('File uploaded successfully!');
+                            window.location.reload();
+                        } else {
+                            console.error('Upload failed:', response);
+                            alert('Upload failed. Please try again.');
+                        }
+                    } else {
+                        console.error('Upload failed with status:', res.status);
+                        alert('Upload failed. Please try again.');
+                    }
+                 } catch (e) {
+                    console.error('Upload error', e);
+                    alert('Upload error. Please try again.');
+                 }
+            }
+        });
+
+        documentsTableBody.addEventListener('click', (e) => {
+            const cell = e.target.closest('.doc-name-cell');
+            if (cell) {
+                const docId = parseInt(cell.dataset.docId);
+                const doc = mockDocuments.find(d => d.id === docId);
+                document.getElementById('details-title').innerText = doc.name;
+                
+                const ocrBadge = document.getElementById('ocr-badge');
+                if (doc.type === 'PDF') ocrBadge.classList.remove('hidden');
+                else ocrBadge.classList.add('hidden');
+
+                const historyContent = document.getElementById('details-history');
+                historyContent.innerHTML = `<ul class="list-disc pl-5">${(doc.history || []).map(h => `<li>v${h.v} (${h.date}) by ${h.user}</li>`).join('')}</ul>`;
+                
+                const metadataContent = document.getElementById('details-metadata');
+                metadataContent.innerHTML = Object.entries(doc.metadata || {}).map(([key, value]) => `<p><strong>${key}:</strong> ${value}</p>`).join('');
+
+                const commentsContent = document.getElementById('details-comments');
+                if ((doc.comments || []).length > 0) {
+                     commentsContent.innerHTML = doc.comments.map(c => `<div class="bg-gray-800 p-2 rounded-lg"><strong>${c.user}:</strong> ${c.text} <span class="text-xs text-gray-500 float-right">${c.time}</span></div>`).join('');
+                } else {
+                    commentsContent.innerHTML = `<p class="text-center text-gray-500">No comments yet.</p>`;
+                }
+
+                toggleModal(detailsModal, true);
+            }
+        });
+        closeDetailsModalBtn.addEventListener('click', () => toggleModal(detailsModal, false));
+
+        function renderCharts() {
+            const chartOptions = { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#9ca3af' } }, x: { grid: { display: false }, ticks: { color: '#9ca3af' } } }, plugins: { legend: { labels: { color: '#9ca3af'} } } };
+
+            new Chart(document.getElementById('activityChart').getContext('2d'), { type: 'line', data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'], datasets: [{ label: 'Docs Processed', data: [120, 190, 300, 500, 210, 350, 450], backgroundColor: 'rgba(59, 130, 246, 0.2)', borderColor: '#3b82f6', tension: 0.4, fill: true }] }, options: { ...chartOptions, plugins: {legend: {display: false}} } });
+            new Chart(document.getElementById('statusChart').getContext('2d'), { type: 'doughnut', data: { labels: ['Approved', 'Pending', 'In Review', 'Archived'], datasets: [{ data: [10000, 32, 500, 2157], backgroundColor: ['#22c55e', '#facc15', '#3b82f6', '#6b7280'] }] }, options: { ...chartOptions, scales: { x: { display: false}, y: {display: false}} } });
+            new Chart(document.getElementById('productivityChart').getContext('2d'), { type: 'bar', data: { labels: ['Admin', 'Anjali Menon', 'You', 'Vijay Kumar'], datasets: [{ label: 'Docs Processed', data: [150, 120, 95, 80], backgroundColor: ['#3b82f6', '#06b6d4', '#8b5cf6', '#ec4899'] }] }, options: { ...chartOptions, plugins: { legend: { display: false } } } });
+            new Chart(document.getElementById('idpDocTypeChart').getContext('2d'), { type: 'pie', data: { labels: ['Invoices', 'Contracts', 'Reports', 'Proposals'], datasets: [{ data: [6250, 2100, 3550, 750], backgroundColor: ['#3b82f6', '#10b981', '#f97316', '#8b5cf6'] }] }, options: { ...chartOptions, scales: { x: { display: false}, y: {display: false}} } });
+
+            const activityFeed = document.getElementById('recent-activity-feed');
+            activityFeed.innerHTML = recentActivity.map(item => `<p><span class="font-semibold text-white">${item.user}</span> ${item.action} <span class="text-blue-400">${item.document}</span> <span class="text-gray-500 float-right">${item.time}</span></p>`).join('');
+        }
+
+        // Enhanced search functionality
+        function setupSearch() {
+            const searchInput = document.querySelector('.search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(performSearch, 300));
+            }
+        }
+
+        // Debounce function for search
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize all enhanced functionality
+            setupSearch();
+            setupFilters();
+            setupEditForm();
+            const hasServerData = window.serverData && (
+                window.serverData.stats || window.serverData.documents || window.serverData.recent_activity
+            );
+            
+            if (!hasServerData) {
+                try {
+                    const data = await fetchDashboardData();
+                    if (data) {
+                        window.serverData = data;
+                        updateStatsFromServer();
+                        // override data sources
+                        if (Array.isArray(data.documents)) {
+                            mockDocuments = data.documents.map(d => ({
+                                id: d.id, name: d.name, type: d.type || '', status: d.status || 'Pending', tags: Array.isArray(d.tags) ? d.tags : [], modified: d.modified || '', access: 'public', version: 1, history: [], metadata: {}, comments: []
+                            }));
+                        }
+                        if (Array.isArray(data.recent_activity)) {
+                            const mapped = data.recent_activity.map(a => ({ user: String(a.user), action: a.action.toLowerCase(), document: a.target || '', time: a.ts }));
+                            while (recentActivity.length) recentActivity.pop(); 
+                            mapped.forEach(x => recentActivity.push(x));
+                        }
+                        if (Array.isArray(data.idp_log)) { 
+                            while (idpLog.length) idpLog.pop(); 
+                            data.idp_log.forEach(l => idpLog.push(l)); 
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading dashboard data:', error);
+                }
+            }
+            
+            updateStatsFromServer();
+            populateDocumentsTable(mockDocuments);
+            populateAuditTrail();
+            populateIdpLog();
+            renderCharts();
+        });
+
+        // dashboard.html
+
+async function renderCharts() { // Make the function async
+    // ... existing options and other charts ...
+
+    // --- START MODIFICATION for Status Chart ---
+    try {
+        const response = await fetch('/api/charts/document_status');
+        const chartData = await response.json();
+
+        new Chart(document.getElementById('statusChart').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: chartData.labels, // Use real labels from API
+                datasets: [{
+                    data: chartData.data, // Use real data from API
+                    backgroundColor: ['#22c55e', '#facc15', '#3b82f6', '#6b7280', '#ef4444'] // Add more colors if needed
+                }]
+            },
+            options: { ...chartOptions, scales: { x: { display: false }, y: { display: false } } }
+        });
+
+    } catch (error) {
+        console.error('Error fetching status chart data:', error);
+        // You could display an error message in the chart container
+    }
+    // --- END MODIFICATION ---
+
+    // ... code for the other charts ...
+    // You can apply the same logic for activityChart and productivityChart!
+}
+
+// Make sure you call this updated function
+document.addEventListener('DOMContentLoaded', () => {
+    // ... your existing code ...
+    // Make sure to call the async function
+    renderCharts(); 
+});
+    </script>
+    
+</body>
+</html>
+

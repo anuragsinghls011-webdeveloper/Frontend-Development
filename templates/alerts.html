@@ -1,0 +1,132 @@
+{% extends "base-layout.html" %}
+
+{% block title %}Alerts | MediTrack{% endblock %}
+
+{% block page_title %}System Alerts{% endblock %}
+
+{% block breadcrumb %}
+  <a href="/dashboard">Dashboard</a> / <span>Alerts</span>
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Medicines Expiring Soon</h3>
+    </div>
+    <div class="card-body">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Quantity</th>
+            <th>Expiry Date</th>
+            <th>Days Until Expiry</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for medicine in expiring_medicines %}
+          <tr>
+            <td>{{ medicine.medicine_id }}</td>
+            <td>{{ medicine.name }}</td>
+            <td>{{ medicine.quantity }}</td>
+            <td>{{ medicine.expiry_date }}</td>
+            <td>{{ medicine.days_until_expiry }}</td>
+            <td>
+              <a href="/medicines?search={{ medicine.medicine_id }}&search_by=id" class="btn btn-primary btn-sm">
+                <i class="fas fa-eye"></i> View
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+          {% if not expiring_medicines %}
+          <tr>
+            <td colspan="6" class="text-center">No medicines expiring soon</td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Equipment Needing Maintenance</h3>
+    </div>
+    <div class="card-body">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Last Maintenance</th>
+            <th>Next Maintenance</th>
+            <th>Days Until Maintenance</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for equip in maintenance_equipment %}
+          <tr>
+            <td>{{ equip.equipment_id }}</td>
+            <td>{{ equip.name }}</td>
+            <td>{{ equip.last_maintenance }}</td>
+            <td>{{ equip.next_maintenance }}</td>
+            <td>{{ equip.days_until_maintenance }}</td>
+            <td>
+              <a href="/equipment?search={{ equip.equipment_id }}&search_by=id" class="btn btn-primary btn-sm">
+                <i class="fas fa-eye"></i> View
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+          {% if not maintenance_equipment %}
+          <tr>
+            <td colspan="6" class="text-center">No equipment needs maintenance soon</td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Low Stock Items</h3>
+    </div>
+    <div class="card-body">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Current Quantity</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in low_stock_items %}
+          <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.type }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>
+              <a href="/{{ item.type }}?search={{ item.id }}&search_by=id" class="btn btn-primary btn-sm">
+                <i class="fas fa-eye"></i> View
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+          {% if not low_stock_items %}
+          <tr>
+            <td colspan="5" class="text-center">No items with low stock</td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

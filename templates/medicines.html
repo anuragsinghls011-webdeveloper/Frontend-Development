@@ -1,0 +1,140 @@
+{% extends "base-layout.html" %}
+
+{% block title %}Medicines | MediTrack{% endblock %}
+
+{% block page_title %}Medicines Inventory{% endblock %}
+
+{% block breadcrumb %}
+  <a href="/dashboard">Dashboard</a> / <span>Medicines</span>
+{% endblock %}
+
+{% block content %}
+  <div class="search-form">
+    <form method="get" action="/medicines">
+      <input type="text" name="search" placeholder="Search medicines..." value="{{ search or '' }}">
+      <select name="search_by">
+        <option value="name" {% if search_by == 'name' %}selected{% endif %}>Name/Manufacturer</option>
+        <option value="id" {% if search_by == 'id' %}selected{% endif %}>ID</option>
+      </select>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+  </div>
+  
+  <div class="card add-form">
+    <div class="card-header">
+      <h3 class="card-title">Add New Medicine</h3>
+    </div>
+    <div class="card-body">
+      <form action="/medicines" method="post">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="medicine_id">Medicine ID</label>
+            <input id="medicine_id" name="medicine_id" class="form-control" placeholder="ID" required>
+          </div>
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input id="name" name="name" class="form-control" placeholder="Medicine Name" required>
+          </div>
+          <div class="form-group">
+            <label for="manufacturer">Manufacturer</label>
+            <input id="manufacturer" name="manufacturer" class="form-control" placeholder="Manufacturer" required>
+          </div>
+          <div class="form-group">
+            <label for="quantity">Quantity</label>
+            <input id="quantity" name="quantity" type="number" class="form-control" placeholder="Quantity" required>
+          </div>
+          <div class="form-group">
+            <label for="cost">Cost</label>
+            <input id="cost" name="cost" type="number" step="0.01" class="form-control" placeholder="Cost" required>
+          </div>
+          <div class="form-group">
+            <label for="expiry_date">Expiry Date</label>
+            <input id="expiry_date" name="expiry_date" type="date" class="form-control" placeholder="Expiry Date" required>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-secondary">Add Medicine</button>
+      </form>
+    </div>
+  </div>
+  
+  <div class="table-container">
+    <div class="table-header">
+      <h3 class="table-title">Medicines List</h3>
+      <div class="table-actions">
+        <button class="btn btn-outline btn-sm" id="exportBtn">
+          <i class="fas fa-file-export"></i> Export
+        </button>
+        <button class="btn btn-outline btn-sm" id="printBtn">
+          <i class="fas fa-print"></i> Print
+        </button>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Manufacturer</th>
+          <th>Quantity</th>
+          <th>Cost</th>
+          <th>Expiry Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr id="row-medicine-{{ row['medicine_id'] }}">
+          <td>{{ row['medicine_id'] }}</td>
+          <td>{{ row['name'] }}</td>
+          <td>{{ row['manufacturer'] }}</td>
+          <td>{{ row['quantity'] }}</td>
+          <td>{{ row['cost'] }}</td>
+          <td>{{ row['expiry_date'] }}</td>
+          <td class="action-cell">
+            <div class="update-controls">
+              <select id="field-medicine-{{ row['medicine_id'] }}" class="form-control action-select">
+                <option value="name">Name</option>
+                <option value="manufacturer">Manufacturer</option>
+                <option value="quantity">Quantity</option>
+                <option value="cost">Cost</option>
+                <option value="expiry_date">Expiry Date</option>
+              </select>
+              <input id="newval-medicine-{{ row['medicine_id'] }}" placeholder="New value" class="form-control action-input">
+              <div class="button-group">
+                <button type="button" class="btn btn-warning" onclick="updateItem({{ row['medicine_id'] }}, 'medicine')">
+                  <i class="fas fa-edit"></i> Update
+                </button>
+                <form action="/delete_medicine/{{ row['medicine_id'] }}" method="post" class="delete-form" onsubmit="return confirmDelete()">
+                  <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                </form>
+              </div>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    
+    {% if not rows %}
+    <div class="no-records">
+      <i class="fas fa-box-open"></i>
+      <h3>No Medicines Found</h3>
+      <p>There are no medicines in the inventory matching your search criteria.</p>
+    </div>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.getElementById('exportBtn').addEventListener('click', function() {
+    alert('Export functionality will be available soon!');
+  });
+  
+  document.getElementById('printBtn').addEventListener('click', function() {
+    window.print();
+  });
+</script>
+{% endblock %}

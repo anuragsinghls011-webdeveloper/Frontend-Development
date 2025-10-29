@@ -1,0 +1,157 @@
+{% extends "base-layout.html" %}
+
+{% block title %}Surgery Supplies | MediTrack{% endblock %}
+
+{% block page_title %}Surgery Supplies Inventory{% endblock %}
+
+{% block breadcrumb %}
+  <a href="/dashboard">Dashboard</a> / <span>Surgery Supplies</span>
+{% endblock %}
+
+{% block content %}
+  <div class="search-form">
+    <form method="get" action="/general_surgery">
+      <input type="text" name="search" placeholder="Search surgery supplies..." value="{{ search or '' }}">
+      <select name="search_by">
+        <option value="name" {% if search_by == 'name' %}selected{% endif %}>Name/Manufacturer</option>
+        <option value="id" {% if search_by == 'id' %}selected{% endif %}>ID</option>
+      </select>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+  </div>
+  
+  <div class="card add-form">
+    <div class="card-header">
+      <h3 class="card-title">Add New Surgery Supply</h3>
+    </div>
+    <div class="card-body">
+      <form action="/general_surgery" method="post">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="equipment_id">Item ID</label>
+            <input id="equipment_id" name="equipment_id" class="form-control" placeholder="ID" required>
+          </div>
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input id="name" name="name" class="form-control" placeholder="Item Name" required>
+          </div>
+          <div class="form-group">
+            <label for="manufacturer">Manufacturer</label>
+            <input id="manufacturer" name="manufacturer" class="form-control" placeholder="Manufacturer" required>
+          </div>
+          <div class="form-group">
+            <label for="cost">Cost</label>
+            <input id="cost" name="cost" type="number" step="0.01" class="form-control" placeholder="Cost" required>
+          </div>
+          <div class="form-group">
+            <label for="last_maintenance">Last Maintenance</label>
+            <input id="last_maintenance" name="last_maintenance" type="date" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="next_maintenance">Next Maintenance</label>
+            <input id="next_maintenance" name="next_maintenance" type="date" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="quantity">Quantity</label>
+            <input id="quantity" name="quantity" type="number" class="form-control" placeholder="Quantity" required>
+          </div>
+          <div class="form-group">
+            <label for="type">Type</label>
+            <select id="type" name="type" class="form-control">
+              <option value="reusable">Reusable</option>
+              <option value="disposable">Disposable</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-secondary">Add Surgery Supply</button>
+      </form>
+    </div>
+  </div>
+  
+  <div class="table-container">
+    <div class="table-header">
+      <h3 class="table-title">Surgery Supplies List</h3>
+      <div class="table-actions">
+        <button class="btn btn-outline btn-sm" id="exportBtn">
+          <i class="fas fa-file-export"></i> Export
+        </button>
+        <button class="btn btn-outline btn-sm" id="printBtn">
+          <i class="fas fa-print"></i> Print
+        </button>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Manufacturer</th>
+          <th>Cost</th>
+          <th>Last Maintenance</th>
+          <th>Next Maintenance</th>
+          <th>Quantity</th>
+          <th>Type</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr id="row-general_surgery-{{ row['equipment_id'] }}">
+          <td>{{ row['equipment_id'] }}</td>
+          <td>{{ row['name'] }}</td>
+          <td>{{ row['manufacturer'] }}</td>
+          <td>{{ row['cost'] }}</td>
+          <td>{{ row['last_maintenance'] }}</td>
+          <td>{{ row['next_maintenance'] }}</td>
+          <td>{{ row['quantity'] }}</td>
+          <td>{{ row['type'] }}</td>
+          <td class="action-cell">
+            <div class="update-controls">
+              <select id="field-general_surgery-{{ row['equipment_id'] }}" class="form-control action-select">
+                <option value="name">Name</option>
+                <option value="manufacturer">Manufacturer</option>
+                <option value="cost">Cost</option>
+                <option value="last_maintenance">Last Maintenance</option>
+                <option value="next_maintenance">Next Maintenance</option>
+                <option value="quantity">Quantity</option>
+                <option value="type">Type</option>
+              </select>
+              <input id="newval-general_surgery-{{ row['equipment_id'] }}" placeholder="New value" class="form-control action-input">
+              <div class="button-group">
+                <button type="button" class="btn btn-warning" onclick="updateItem({{ row['equipment_id'] }}, 'general_surgery')">
+                  <i class="fas fa-edit"></i> Update
+                </button>
+                <form action="/delete_general_surgery/{{ row['equipment_id'] }}" method="post" class="delete-form" onsubmit="return confirmDelete()">
+                  <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                </form>
+              </div>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    
+    {% if not rows %}
+    <div class="no-records">
+      <i class="fas fa-procedures"></i>
+      <h3>No Surgery Supplies Found</h3>
+      <p>There are no surgery supplies in the inventory matching your search criteria.</p>
+    </div>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.getElementById('exportBtn').addEventListener('click', function() {
+    alert('Export functionality will be available soon!');
+  });
+  
+  document.getElementById('printBtn').addEventListener('click', function() {
+    window.print();
+  });
+</script>
+{% endblock %}

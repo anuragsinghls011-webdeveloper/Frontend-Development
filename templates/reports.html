@@ -1,0 +1,274 @@
+{% extends "base-layout.html" %}
+
+{% block title %}Reports | MediTrack{% endblock %}
+
+{% block page_title %}Inventory Reports{% endblock %}
+
+{% block breadcrumb %}
+  <a href="/dashboard">Dashboard</a> / <span>Reports</span>
+{% endblock %}
+
+{% block content %}
+  <div class="reports-header">
+    <div class="report-date-range">
+      <form action="/reports" method="get" class="range-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="start_date">Start Date</label>
+            <input type="date" id="start_date" name="start_date" class="form-control" value="{{ start_date or '' }}">
+          </div>
+          <div class="form-group">
+            <label for="end_date">End Date</label>
+            <input type="date" id="end_date" name="end_date" class="form-control" value="{{ end_date or today }}">
+          </div>
+          <div class="form-group">
+            <label for="report_type">Report Type</label>
+            <select id="report_type" name="report_type" class="form-control">
+              <option value="all" {% if report_type == 'all' %}selected{% endif %}>All Categories</option>
+              <option value="equipment" {% if report_type == 'equipment' %}selected{% endif %}>Equipment</option>
+              <option value="medicines" {% if report_type == 'medicines' %}selected{% endif %}>Medicines</option>
+              <option value="general_surgery" {% if report_type == 'general_surgery' %}selected{% endif %}>Surgery Supplies</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Generate Report</button>
+        </div>
+      </form>
+    </div>
+    <div class="report-actions">
+      <button class="btn btn-outline" id="exportReportBtn" onclick="exportReport()">
+        <i class="fas fa-file-export"></i> Export Report
+      </button>
+      <button class="btn btn-outline" id="printReportBtn" onclick="window.print()">
+        <i class="fas fa-print"></i> Print Report
+      </button>
+    </div>
+  </div>
+
+  <div class="dashboard-grid reports-summary">
+    <div class="stat-card stat-card-primary">
+      <div class="stat-card-content">
+        <h3>Total Value</h3>
+        <div class="stat-value">₹{{ total_value }}</div>
+      </div>
+      <div class="stat-card-icon">
+        <i class="fas fa-rupee-sign"></i>
+      </div>
+    </div>
+    
+    <div class="stat-card stat-card-secondary">
+      <div class="stat-card-content">
+        <h3>Total Items</h3>
+        <div class="stat-value">{{ total_items }}</div>
+      </div>
+      <div class="stat-card-icon">
+        <i class="fas fa-boxes"></i>
+      </div>
+    </div>
+    
+    <div class="stat-card stat-card-warning">
+      <div class="stat-card-content">
+        <h3>Equipment Count</h3>
+        <div class="stat-value">{{ equipment_count }}</div>
+      </div>
+      <div class="stat-card-icon">
+        <i class="fas fa-tools"></i>
+      </div>
+    </div>
+    
+    <div class="stat-card stat-card-danger">
+      <div class="stat-card-content">
+        <h3>Medicines Count</h3>
+        <div class="stat-value">{{ medicines_count }}</div>
+      </div>
+      <div class="stat-card-icon">
+        <i class="fas fa-pills"></i>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Inventory Value Distribution</h3>
+    </div>
+    <div class="card-body chart-container">
+      <canvas id="valueDistributionChart"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Inventory Items Report</h3>
+    </div>
+    <div class="card-body">
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Total Items</th>
+            <th>Total Value</th>
+            <th>Average Cost</th>
+            <th>Low Stock Items</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Equipment</td>
+            <td>{{ equipment_count }}</td>
+            <td>₹{{ equipment_value }}</td>
+            <td>₹{{ equipment_value / equipment_count if equipment_count > 0 else 0 }}</td>
+            <td>N/A</td>
+          </tr>
+          <tr>
+            <td>Medicines</td>
+            <td>{{ medicines_count }}</td>
+            <td>₹{{ medicines_value }}</td>
+            <td>₹{{ medicines_value / medicines_count if medicines_count > 0 else 0 }}</td>
+            <td>{{ medicines_count }}</td>
+          </tr>
+          <tr>
+            <td>Surgery Supplies</td>
+            <td>{{ surgery_count }}</td>
+            <td>₹{{ surgery_value }}</td>
+            <td>₹{{ surgery_value / surgery_count if surgery_count > 0 else 0 }}</td>
+            <td>{{ surgery_count }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Detailed Report</h3>
+    </div>
+    <div class="card-body">
+      <table>
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Manufacturer</th>
+            <th>Cost</th>
+            <th>Quantity/Location</th>
+            <th>Status/Expiry</th>
+            <th>Date Added</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in detailed_data %}
+          <tr>
+            <td>
+              {% if item['type'] == 'equipment' %}
+                <span class="badge badge-primary"><i class="fas fa-tools"></i> Equipment</span>
+              {% elif item['type'] == 'medicine' %}
+                <span class="badge badge-secondary"><i class="fas fa-pills"></i> Medicine</span>
+              {% else %}
+                <span class="badge badge-warning"><i class="fas fa-procedures"></i> Surgery</span>
+              {% endif %}
+            </td>
+            <td>{{ item['id'] }}</td>
+            <td>{{ item['name'] }}</td>
+            <td>{{ item['manufacturer'] }}</td>
+            <td>₹{{ item['cost'] }}</td>
+            <td>
+              {% if item['type'] == 'equipment' %}
+                {{ item['location'] }}
+              {% elif item['type'] == 'surgery' %}
+                {{ item['quantity'] }} ({{ item['item_type'] }})
+              {% else %}
+                {{ item['quantity'] }}
+              {% endif %}
+            </td>
+            <td>
+              {% if item['type'] == 'equipment' %}
+                {{ item['status'] }}
+              {% elif item['type'] == 'medicine' %}
+                {{ item['expiry_date'] }}
+              {% elif item['type'] == 'surgery' %}
+                Next Maintenance: {{ item['next_maintenance'] }}
+              {% endif %}
+            </td>
+            <td>{{ item['date_added'] if item['date_added'] else 'N/A' }}</td>
+          </tr>
+          {% endfor %}
+          {% if not detailed_data %}
+          <tr>
+            <td colspan="8" class="text-center">No data available for the selected criteria</td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Chart initialization
+    const ctx = document.getElementById('valueDistributionChart').getContext('2d');
+    const valueChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['Equipment', 'Medicines', 'Surgery Supplies'],
+        datasets: [{
+          data: [
+            {{ equipment_value|default(0) }},
+            {{ medicines_value|default(0) }},
+            {{ surgery_value|default(0) }}
+          ],
+          backgroundColor: [
+            '#4e73df',
+            '#1cc88a',
+            '#36b9cc'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  });
+
+  function exportReport() {
+    // Get the table data
+    const table = document.querySelector('table');
+    if (!table) return;
+
+    // Create CSV content
+    let csv = [];
+    const rows = table.querySelectorAll('tr');
+    
+    for (let i = 0; i < rows.length; i++) {
+      const row = [], cols = rows[i].querySelectorAll('td, th');
+      
+      for (let j = 0; j < cols.length; j++) {
+        // Get the text content, removing any HTML tags
+        let data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').trim();
+        // Wrap in quotes if it contains a comma
+        if (data.includes(',')) data = `"${data}"`;
+        row.push(data);
+      }
+      csv.push(row.join(','));
+    }
+
+    // Create and download the file
+    const csvContent = csv.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `inventory_report_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+</script>
+{% endblock %}

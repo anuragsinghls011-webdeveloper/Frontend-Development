@@ -1,0 +1,131 @@
+{% extends "base-layout.html" %}
+
+{% block title %}Dashboard | MediTrack{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block breadcrumb %}
+  <span>Dashboard</span>
+{% endblock %}
+
+{% block content %}
+  <div class="dashboard-grid">
+    <div class="stat-card stat-card-primary">
+      <div class="stat-card-content">
+        <h3>Total Equipment</h3>
+        <div class="stat-value">{{ equipment_count }}</div>
+      </div>
+      <div class="stat-card-icon">
+        <i class="fas fa-tools"></i>
+      </div>
+    </div>
+    
+    <div class="stat-card stat-card-secondary">
+      <div class="stat-card-content">
+        <h3>Total Medicines</h3>
+        <div class="stat-value">{{ medicine_count }}</div>
+      </div>
+      <div class="stat-card-icon">
+        <i class="fas fa-pills"></i>
+      </div>
+    </div>
+    
+    <div class="stat-card stat-card-warning">
+      <div class="stat-card-content">
+        <h3>Surgery Supplies</h3>
+        <div class="stat-value">{{ surgery_count }}</div>
+      </div>
+      <div class="stat-card-icon">
+        <i class="fas fa-procedures"></i>
+      </div>
+    </div>
+    
+    <div class="stat-card stat-card-danger">
+      <div class="stat-card-content">
+        <h3>Items Needing Attention</h3>
+        <div class="stat-value">{{ alert_count }}</div>
+      </div>
+      <div class="stat-card-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Expiring Medicines</h3>
+    </div>
+    <div class="card-body">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Quantity</th>
+            <th>Expiry Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for medicine in expiring_medicines %}
+          <tr>
+            <td>{{ medicine.medicine_id }}</td>
+            <td>{{ medicine.name }}</td>
+            <td>{{ medicine.quantity }}</td>
+            <td>{{ medicine.expiry_date }}</td>
+            <td>
+              <a href="/medicines?search={{ medicine.medicine_id }}&search_by=id" class="btn btn-primary btn-sm">
+                <i class="fas fa-eye"></i> View
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+          {% if not expiring_medicines %}
+          <tr>
+            <td colspan="5" class="text-center">No medicines expiring soon</td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Equipment Needing Maintenance</h3>
+    </div>
+    <div class="card-body">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Last Maintenance</th>
+            <th>Next Maintenance</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for equip in maintenance_equipment %}
+          <tr>
+            <td>{{ equip.equipment_id }}</td>
+            <td>{{ equip.name }}</td>
+            <td>{{ equip.last_maintenance }}</td>
+            <td>{{ equip.next_maintenance }}</td>
+            <td>
+              <a href="/equipment?search={{ equip.equipment_id }}&search_by=id" class="btn btn-primary btn-sm">
+                <i class="fas fa-eye"></i> View
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+          {% if not maintenance_equipment %}
+          <tr>
+            <td colspan="5" class="text-center">No equipment needs maintenance soon</td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

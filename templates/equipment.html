@@ -1,0 +1,140 @@
+{% extends "base-layout.html" %}
+
+{% block title %}Equipment | MediTrack{% endblock %}
+
+{% block page_title %}Equipment Inventory{% endblock %}
+
+{% block breadcrumb %}
+  <a href="/dashboard">Dashboard</a> / <span>Equipment</span>
+{% endblock %}
+
+{% block content %}
+  <div class="search-form">
+    <form method="get" action="/equipment">
+      <input type="text" name="search" placeholder="Search equipment..." value="{{ search or '' }}">
+      <select name="search_by">
+        <option value="name" {% if search_by == 'name' %}selected{% endif %}>Name/Manufacturer</option>
+        <option value="id" {% if search_by == 'id' %}selected{% endif %}>ID</option>
+      </select>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+  </div>
+  
+  <div class="card add-form">
+    <div class="card-header">
+      <h3 class="card-title">Add New Equipment</h3>
+    </div>
+    <div class="card-body">
+      <form action="/equipment" method="post">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="equipment_id">Equipment ID</label>
+            <input id="equipment_id" name="equipment_id" class="form-control" placeholder="ID" required>
+          </div>
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input id="name" name="name" class="form-control" placeholder="Equipment Name" required>
+          </div>
+          <div class="form-group">
+            <label for="manufacturer">Manufacturer</label>
+            <input id="manufacturer" name="manufacturer" class="form-control" placeholder="Manufacturer" required>
+          </div>
+          <div class="form-group">
+            <label for="cost">Cost</label>
+            <input id="cost" name="cost" type="number" step="0.01" class="form-control" placeholder="Cost" required>
+          </div>
+          <div class="form-group">
+            <label for="last_maintenance">Last Maintenance</label>
+            <input id="last_maintenance" name="last_maintenance" type="date" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="next_maintenance">Next Maintenance</label>
+            <input id="next_maintenance" name="next_maintenance" type="date" class="form-control" required>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-secondary">Add Equipment</button>
+      </form>
+    </div>
+  </div>
+  
+  <div class="table-container">
+    <div class="table-header">
+      <h3 class="table-title">Equipment List</h3>
+      <div class="table-actions">
+        <button class="btn btn-outline btn-sm" id="exportBtn">
+          <i class="fas fa-file-export"></i> Export
+        </button>
+        <button class="btn btn-outline btn-sm" id="printBtn">
+          <i class="fas fa-print"></i> Print
+        </button>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Manufacturer</th>
+          <th>Cost</th>
+          <th>Last Maintenance</th>
+          <th>Next Maintenance</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr id="row-equipment-{{ row['equipment_id'] }}">
+          <td>{{ row['equipment_id'] }}</td>
+          <td>{{ row['name'] }}</td>
+          <td>{{ row['manufacturer'] }}</td>
+          <td>{{ row['cost'] }}</td>
+          <td>{{ row['last_maintenance'] }}</td>
+          <td>{{ row['next_maintenance'] }}</td>
+          <td class="action-cell">
+            <div class="update-controls">
+              <select id="field-equipment-{{ row['equipment_id'] }}" class="form-control action-select">
+                <option value="name">Name</option>
+                <option value="manufacturer">Manufacturer</option>
+                <option value="cost">Cost</option>
+                <option value="last_maintenance">Last Maintenance</option>
+                <option value="next_maintenance">Next Maintenance</option>
+              </select>
+              <input id="newval-equipment-{{ row['equipment_id'] }}" placeholder="New value" class="form-control action-input">
+              <div class="button-group">
+                <button type="button" class="btn btn-warning" onclick="updateItem({{ row['equipment_id'] }}, 'equipment')">
+                  <i class="fas fa-edit"></i> Update
+                </button>
+                <form action="/delete_equipment/{{ row['equipment_id'] }}" method="post" class="delete-form" onsubmit="return confirmDelete()">
+                  <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                </form>
+              </div>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    
+    {% if not rows %}
+    <div class="no-records">
+      <i class="fas fa-tools"></i>
+      <h3>No Equipment Found</h3>
+      <p>There are no equipment items in the inventory matching your search criteria.</p>
+    </div>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.getElementById('exportBtn').addEventListener('click', function() {
+    alert('Export functionality will be available soon!');
+  });
+  
+  document.getElementById('printBtn').addEventListener('click', function() {
+    window.print();
+  });
+</script>
+{% endblock %}

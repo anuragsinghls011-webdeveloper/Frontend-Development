@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Hospital Inventory Management{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="{{ url_for('static', filename='completed-script-js.js') }}?v=1.1" defer></script>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        
+        <h1> 
+          <img src="https://pbs.twimg.com/profile_images/1153953160135790592/aEOF5tDF_400x400.png" id="image"> SRMS IMS
+        </h1>
+        
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/dashboard" class="{{ 'active' if request.path == '/dashboard' else '' }}">
+          <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="/equipment" class="{{ 'active' if request.path == '/equipment' else '' }}">
+          <i class="fas fa-tools"></i> Equipment
+        </a>
+        <a href="/medicines" class="{{ 'active' if request.path == '/medicines' else '' }}">
+          <i class="fas fa-pills"></i> Medicines
+        </a>
+        <a href="/general_surgery" class="{{ 'active' if request.path == '/general_surgery' else '' }}">
+          <i class="fas fa-procedures"></i> Surgery Supplies
+        </a>
+        <a href="/reports" class="{{ 'active' if request.path == '/reports' else '' }}">
+          <i class="fas fa-chart-bar"></i> Reports
+        </a>
+        <a href="/alerts" class="{{ 'active' if request.path == '/alerts' else '' }}">
+          <i class="fas fa-bell"></i> Alerts
+          <span class="alert-badge" id="alertCount">{{ alert_count if alert_count else '' }}</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <p>© 2025 MediTrack</p>
+      </div>
+    </aside>
+    
+    <main class="main-content">
+      <header class="top-header">
+        <div class="search-global">
+          <form action="/search" method="get" id="search-form">
+            <input type="text" name="query" id="search-input" placeholder="Search inventory..." required autocomplete="off">
+            <button type="submit"><i class="fas fa-search"></i></button>
+            <div id="search-suggestions" class="search-suggestions"></div>
+          </form>
+          
+        </div>
+        <div class="header-actions">
+          <button id="btnExport" class="btn-icon" title="Export Data">
+            <i class="fas fa-file-export"></i>
+          </button>
+          <button id="btnPrint" class="btn-icon" title="Print">
+            <i class="fas fa-print"></i>
+          </button>
+          <div class="theme-toggle">
+            <input type="checkbox" id="themeSwitch">
+            <label for="themeSwitch">
+              <i class="fas fa-sun"></i>
+              <i class="fas fa-moon"></i>
+            </label>
+          </div>
+        </div>
+      </header>
+      
+      <div class="content-wrapper">
+        <section class="content-header">
+          <h2>{% block page_title %}Dashboard{% endblock %}</h2>
+          <div class="breadcrumb">
+            <span>{% block breadcrumb %}Home{% endblock %}</span>
+          </div>
+        </section>
+        
+        <section class="content-body">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                  <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+                  {{ message }}
+                  <button class="close-alert">&times;</button>
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+          
+          {% block content %}{% endblock %}
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal template -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Modal Title</h3>
+        <button class="close-modal">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Content will be loaded here -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modalCancel">Cancel</button>
+        <button class="btn btn-primary" id="modalConfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Search suggestions functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('search-input');
+      const searchSuggestions = document.getElementById('search-suggestions');
+      const searchForm = document.getElementById('search-form');
+      let debounceTimer;
+      
+      if (searchInput && searchSuggestions) {
+        searchInput.addEventListener('input', function() {
+          clearTimeout(debounceTimer);
+          const query = this.value.trim();
+          
+          if (query.length < 2) {
+            searchSuggestions.innerHTML = '';
+            searchSuggestions.style.display = 'none';
+            return;
+          }
+          
+          debounceTimer = setTimeout(function() {
+            fetch(`/search_suggestions?query=${encodeURIComponent(query)}`)
+              .then(response => response.json())
+              .then(data => {
+                if (data.length > 0) {
+                  let html = '';
+                  data.forEach(item => {
+                    let icon = 'fa-tools';
+                    if (item.type === 'medicine') icon = 'fa-pills';
+                    if (item.type === 'surgery') icon = 'fa-procedures';
+                    
+                    html += `<div class="suggestion-item" data-name="${item.name}">
+                      <i class="fas ${icon}"></i>
+                      <span>${item.name}</span>
+                      <small>${item.type.charAt(0).toUpperCase() + item.type.slice(1)}</small>
+                    </div>`;
+                  });
+                  
+                  searchSuggestions.innerHTML = html;
+                  searchSuggestions.style.display = 'block';
+                  
+                  // Add click event to suggestion items
+                  document.querySelectorAll('.suggestion-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                      searchInput.value = this.dataset.name;
+                      searchSuggestions.style.display = 'none';
+                      searchForm.submit();
+                    });
+                  });
+                } else {
+                  searchSuggestions.innerHTML = '';
+                  searchSuggestions.style.display = 'none';
+                }
+              })
+              .catch(error => {
+                console.error('Error fetching suggestions:', error);
+                searchSuggestions.style.display = 'none';
+              });
+          }, 300);
+        });
+        
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+          if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
+            searchSuggestions.style.display = 'none';
+          }
+        });
+      }
+    });
+
+    // Initialize date pickers
+    flatpickr("input[type=date]", {
+      dateFormat: "Y-m-d",
+      allowInput: true,
+      altInput: true,
+      altFormat: "F j, Y"
+    });
+  </script>
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

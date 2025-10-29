@@ -1,0 +1,144 @@
+{% extends "base-layout.html" %}
+
+{% block title %}Search Results | MediTrack{% endblock %}
+
+{% block page_title %}Search Results{% endblock %}
+
+{% block breadcrumb %}
+  <a href="/dashboard">Dashboard</a> / <span>Search Results</span>
+{% endblock %}
+
+{% block content %}
+  <div class="search-summary">
+    <h3>Search Results for "{{ query }}"</h3>
+    <p>Found {{ total_count }} items: {{ equipment_count }} equipment, {{ medicine_count }} medicines, {{ surgery_count }} surgery supplies</p>
+    
+    <div class="search-filters">
+      <button class="filter-btn active" data-filter="all">All ({{ total_count }})</button>
+      <button class="filter-btn" data-filter="equipment">Equipment ({{ equipment_count }})</button>
+      <button class="filter-btn" data-filter="medicine">Medicines ({{ medicine_count }})</button>
+      <button class="filter-btn" data-filter="surgery">Surgery ({{ surgery_count }})</button>
+    </div>
+  </div>
+  
+  {% if results %}
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Manufacturer</th>
+            <th>Cost</th>
+            <th>Quantity</th>
+            <th>Location/Expiry</th>
+            <th>Status/Maintenance</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in results %}
+            <tr class="result-row" data-type="{{ item['type'] }}">
+              <td>
+                {% if item['type'] == 'equipment' %}
+                  <span class="badge badge-primary"><i class="fas fa-tools"></i> Equipment</span>
+                {% elif item['type'] == 'medicine' %}
+                  <span class="badge badge-secondary"><i class="fas fa-pills"></i> Medicine</span>
+                {% elif item['type'] == 'surgery' %}
+                  <span class="badge badge-warning"><i class="fas fa-procedures"></i> Surgery</span>
+                {% endif %}
+              </td>
+              <td>{{ item['equipment_id'] if item['type'] == 'equipment' else item['medicine_id'] }}</td>
+              <td>{{ item['name'] }}</td>
+              <td>{{ item['manufacturer'] }}</td>
+              <td>₹{{ item['cost'] }}</td>
+              <td>
+                {% if item['type'] == 'equipment' %}
+                  1
+                {% else %}
+                  {{ item['quantity'] }}
+                {% endif %}
+              </td>
+              <td>
+                {% if item['type'] == 'equipment' %}
+                  {{ item['location'] }}
+                {% elif item['type'] == 'medicine' %}
+                  {{ item['expiry_date'] }}
+                {% else %}
+                  {{ item['location'] }}
+                {% endif %}
+              </td>
+              <td>
+                {% if item['type'] == 'equipment' %}
+                  {{ item['status'] }}<br>
+                  <small>Next: {{ item['next_maintenance'] }}</small>
+                {% elif item['type'] == 'medicine' %}
+                  {% if item['quantity'] <= 5 %}
+                    <span class="badge badge-danger">Low Stock</span>
+                  {% else %}
+                    <span class="badge badge-success">In Stock</span>
+                  {% endif %}
+                {% else %}
+                  {% if item['quantity'] <= 5 %}
+                    <span class="badge badge-danger">Low Stock</span>
+                  {% else %}
+                    <span class="badge badge-success">In Stock</span>
+                  {% endif %}
+                  <br>
+                  <small>Next: {{ item['next_maintenance'] }}</small>
+                {% endif %}
+              </td>
+              <td>
+                {% if item['type'] == 'equipment' %}
+                  <a href="/equipment" class="btn btn-sm btn-primary">View</a>
+                {% elif item['type'] == 'medicine' %}
+                  <a href="/medicines" class="btn btn-sm btn-primary">View</a>
+                {% elif item['type'] == 'surgery' %}
+                  <a href="/general_surgery" class="btn btn-sm btn-primary">View</a>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="no-results">
+      <i class="fas fa-search"></i>
+      <h3>No Results Found</h3>
+      <p>No items match your search criteria. Try a different search term.</p>
+    </div>
+  {% endif %}
+  
+  <div class="search-actions">
+    <a href="/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+    <a href="/search?query={{ query }}" class="btn btn-primary">New Search</a>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      const resultRows = document.querySelectorAll('.result-row');
+      
+      filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          // Update active button
+          filterButtons.forEach(btn => btn.classList.remove('active'));
+          this.classList.add('active');
+          
+          const filter = this.getAttribute('data-filter');
+          
+          // Filter rows
+          resultRows.forEach(row => {
+            if (filter === 'all' || row.getAttribute('data-type') === filter) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+          });
+        });
+      });
+    });
+  </script>
+{% endblock %} 
